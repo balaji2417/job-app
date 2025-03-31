@@ -1,3 +1,4 @@
+
 .App {
   text-align: center;
 }
@@ -12,7 +13,93 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+.nav-links {
+  margin-top: 10px;
+}
+.Name {
+  font-size: 36px; 
+  font-weight: 700; 
+  letter-spacing: 3px;
+  text-align: center;
+  padding-top: 4.8%;
+}
 
+img {
+  max-width: 120px; 
+  max-height: 120px;
+  margin-bottom: 20px;
+}
+
+
+    #signup_in {
+      background: black; 
+      border-radius: 10px; 
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width:100%;
+      max-width: 400px;
+      color: white; 
+    }
+    .cac {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      padding:10px;
+    }
+    .form-control {
+      
+      
+      margin-bottom:15px;
+      width:70%;
+      
+    }
+   
+
+    .btn-primary {
+      width: 100%;
+      border-radius: 5px;
+    }
+    .user-type {
+      text-align: left;
+      margin-bottom: 20px;
+      margin-left:30px;
+    }
+
+    .labelG {
+      margin-right: 15px;
+      margin-left:10px;
+    }
+    
+    #btn-signup {
+      width: 100%;
+      border-radius: 5px;
+      margin-top:2px;
+      background-color: blue;
+      color: white;
+    }
+
+    #btn-signup:hover {
+      background-color: blue;
+    }
+
+    .nav-links {
+      margin-top: 10px;
+    }
+
+    
+    .user-type {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .user-type label {
+      margin-right: 15px;
+    }
+
+    .container-fluid {
+  padding: 0;  
+  margin: 0;   
+}
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -23,7 +110,12 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+#top-bar {
+  background-color: black;
 
+  padding: 10px 0; 
+  color: white;
+}
 .App-link {
   color: #61dafb;
 }
