@@ -41,7 +41,7 @@ function App() {
 
       
       if (response.ok) {
-        navigate('/');
+        navigate('/joblist');
         
        
         

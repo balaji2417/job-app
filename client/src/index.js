@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Login from './client/Login';
 import Home from './client/Home';
+import JobListings from './client/JobListings';
 
 // Create a root element to render the app
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -20,6 +21,7 @@ root.render(
         <Route path="/" element={<Home />} />
         <Route path="login" element = {<App />}/>
         <Route path="register" element={<Login />} />
+        <Route path="joblist" element={<JobListings />} />
       </Routes>
     </BrowserRouter>
  
