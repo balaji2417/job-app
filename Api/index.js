@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
@@ -8,9 +9,10 @@ const cookieParser = require('cookie-parser');
 // Initialize Prisma Client and Express app
 const prisma = new PrismaClient();
 const app = express();
+app.use(cors());
 
 // Middleware to parse JSON request bodies and cookies
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cookieParser());
 
 
@@ -73,6 +75,8 @@ app.post('/api/register', async (req, res) => {
 // POST endpoint: Login a user
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
+    console.log("This is",email);
+    console.log("This Is ",password);
 
     if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required." });
@@ -115,7 +119,7 @@ app.get('/api/protected', requireAuth, (req, res) => {
 });
 
 // Start the Express server
-const PORT = process.env.PORT || 3000;
+const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
