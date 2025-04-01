@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../JobListings.css';
 import '../App.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import neu from '../images/northeastern.jpg';
 import jobImage from '../images/jobapp.jpg';
 
@@ -12,6 +12,7 @@ const JobListings = () => {
   const [message, setMessage] = useState('Good Morning');
   const [isLoading, setIsLoading] = useState(false);
   const [jobs, setJobs] = useState([]);
+  const navigate = useNavigate();
   
   const [error, setError] = useState(null);
 
@@ -68,7 +69,31 @@ const JobListings = () => {
   useEffect(() => {
     fetchJobs();
   }, [currentQuery, currentLocation]);
+  const handleLogout = async () => {
+    try {
+        const response = await fetch('http://localhost:5000/api/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include', // This sends cookies if any (necessary for cookie-based sessions)
+        });
 
+        const data = await response.json();
+
+        if (response.ok) {
+            // Success: Show a message and redirect to login
+            alert(data.message); // "Logged out successfully"
+            navigate('/login'); // Redirect user to the login page
+        } else {
+            // Handle any errors
+            alert("Logout failed: " + data.message);
+        }
+    } catch (error) {
+        console.error("Error during logout:", error);
+        alert("An error occurred during logout.");
+    }
+};
   return (
     <div>
 
@@ -82,7 +107,7 @@ const JobListings = () => {
             <h1 class="Name">Job Portal</h1>
           </div>
           <div class="col-sm">
-          <button type="submit" style = {{width:"50%"}} class="btn "id = "btn-signup">Log Out</button>
+          <button type="submit" style = {{width:"50%"}} class="btn "id = "btn-signup" onClick={handleLogout}>Log Out</button>
           </div>
         </div>
       </div>

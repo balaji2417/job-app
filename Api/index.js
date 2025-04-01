@@ -10,9 +10,14 @@ const prisma = new PrismaClient();
 const app = express();
 
 // Middleware to parse JSON request bodies and cookies
-app.use(cors());
+
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({
+    origin: 'http://localhost:3000', // React app's URL
+    methods: ['POST', 'GET'],
+    credentials: true,  // Allow cookies to be sent with the request
+}));
 
 // Secret key for JWT (should be stored in an environment variable in production)
 const JWT_SECRET = '][q,s^z4X_J|5c[';
@@ -126,6 +131,7 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/logout', (req, res) => {
     // Clear the token by setting it to an expired value
     res.clearCookie('token');
+    console.log(res);
     return res.status(200).json({ message: "Logged out successfully" });
 });
 
