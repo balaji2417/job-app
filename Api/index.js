@@ -45,10 +45,7 @@ const requireAuth = (req, res, next) => {
 app.post('/api/register', async (req, res) => {
     const { email, password, firstName, lastName, dateOfBirth } = req.body;
 
-    if (!email || !password || !firstName || !lastName || !dateOfBirth) {
-        return res.status(400).json({ message: "All fields are required." });
-    }
-
+  
     try {
         // Create a new user without hashing the password
         const newUser = await prisma.user.create({

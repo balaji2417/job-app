@@ -3,10 +3,91 @@ import '../App.css';
 import neu from '../images/northeastern.jpg';
 import jobImage from '../images/jobapp.jpg';
 import RadioButtons from './RadioButtons';
+import React ,{useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 export default function Login () {
+  const [email, setEmail] = useState('');
   
+    const [password, setPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [dob,setDob] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const navigate = useNavigate();
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      const today = new Date();
+      const dob_inter = new Date(dob);
+      let age = today.getFullYear() - dob_inter.getFullYear();
+        const monthDifference = today.getMonth() - dob_inter.getMonth();
+
+        // If the birthday hasn't happened yet this year, subtract 1 from age
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < dob.getDate())) {
+            age--;
+        }
+      
+      setError('');
+      setSuccess('');
+     
+      
+      if (!email || !password || !firstName || !lastName || !dob) {
+        setError('Fill in all fields!');
+        return;
+      }
+       
+      if(age < 18 ) {
+        setError('Age must be greater than 18');
+        return;
+      }
+      if (!emailRegex.test(email)) {
+        setError('Please enter a valid email!');
+        return;
+      }
+
+     
+
+      if(password.includes(email) || password.length <8) {
+        setError('Password should not contain username or password should be greater than 8 ');
+        return;
+      }
+
+
+      
+  
+      try {
+        
+        const response = await fetch('http://localhost:5000/api/register', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json', // Specify that you're sending JSON
+          },
+          body: JSON.stringify({ email, password, firstName, lastName, dob }), // Send email and password in the body
+      });
+      
+        const data = await response.json();
+  
+        
+        if (response.ok) {
+          alert("Data Inserted SUccessfully!!!");
+          setSuccess(data.message);
+          navigate('/');
+         
+          
+        } else {
+          alert(data.message)
+          setError(data.message);  
+        }
+      } catch (err) {
+        console.error('Error during login:', err);
+        
+        setError('An error occurred during login. Please try again later.');
+      }
+    };
   return (
       <div>
 <div class="container-fluid" id="top-bar" >
@@ -36,13 +117,29 @@ export default function Login () {
         }}>
   <div id="signup_in">
   <h2 class = "cac" >Create an Account</h2>
-      <form >
-      <input type="text" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="username" name="username" placeholder="Username" required/>
-      <input type="text" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="FirstName" name="FirstName" placeholder="First Name" required/>
-      <input type="text" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="LastName" name="LastName" placeholder="Last Name" required/>
-        <input type="password" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="password" name="password" placeholder="Password" required/>
-        <input type="text" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="Id" name="Id" placeholder="Enter your MailId " required/>
-        <input type="date" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="Id" name="Id" placeholder="Enter your DOB " required/>
+  {error && <div style={{ color: 'red' }}>{error}</div>}
+      <form onSubmit={handleSubmit}>
+      
+      <input type="text" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="FirstName" name="FirstName" placeholder="First Name"
+      value={firstName}
+      onChange={(e) => setFirstName(e.target.value)}
+      required/>
+      <input type="text" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="LastName" name="LastName" placeholder="Last Name"
+      value={lastName}
+      onChange={(e) => setLastName(e.target.value)}
+      required/>
+        <input type="password" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="password" name="password" placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required/>
+        <input type="text" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}}  name="Id" placeholder="Enter your MailId "
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required/>
+        <input type="date" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}}  name="Id" placeholder="Enter your DOB " 
+        value={dob}
+        onChange={(e) => setDob(e.target.value)}
+        required/>
         <RadioButtons/>
         <br></br>
         <button type="submit" class="btn " style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id = "btn-signup">Sign Up</button>
