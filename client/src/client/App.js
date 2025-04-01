@@ -3,7 +3,7 @@ import '../App.css';
 import neu from '../images/northeastern.jpg';
 import React ,{useState} from 'react';
 
-
+import { useNavigate } from 'react-router-dom';
 import jobImage from '../images/jobapp.jpg';
 import { Link } from 'react-router-dom';
 
@@ -11,15 +11,15 @@ function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-
+  
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    
+   
     setError('');
-    setSuccess('');
+   
 
     
     if (!email || !password) {
@@ -41,17 +41,17 @@ function App() {
 
       
       if (response.ok) {
-        alert("Hello");
-        setSuccess(data.message);
+        navigate('/');
+        
        
         
       } else {
-        alert("Bala");
+        
         setError(data.message);  
       }
     } catch (err) {
       console.error('Error during login:', err);
-      alert("Hello");
+      
       setError('An error occurred during login. Please try again later.');
     }
   };
@@ -86,7 +86,6 @@ function App() {
   <div id="signup_in">
   <h2 class = "cac" >Log in</h2>
   {error && <div style={{ color: 'red' }}>{error}</div>}
-  {success && <div style={{ color: 'green' }}>{success}</div>}
       <form onSubmit={handleSubmit}>
       <input type="text" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}}class="form-control" id="username" name="username" placeholder="Username" required
       value={email}
