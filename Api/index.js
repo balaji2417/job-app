@@ -107,7 +107,9 @@ app.post('/api/login', async (req, res) => {
     try {
         // Find the user by email
         const user = await prisma.user.findUnique({
-            where: { email: email }
+            where: { email: email },
+            select :{email:true,firstName:true},
+            
         });
 
         // Validate user and password (direct comparison)
@@ -126,7 +128,20 @@ app.post('/api/login', async (req, res) => {
         return res.status(500).json({ message: "Error during login" });
     }
 });
+app.get("/me", requireAuth, async (req, res) => {
 
+    const user = await prisma.user.findUnique({
+  
+      where: { email: req.email },
+  
+      select: { email: true, firstName: true },
+  
+    });
+  
+    res.json(user);
+  
+  });
+   
 // POST endpoint: Logout a user (Clear token)
 app.post('/api/logout', (req, res) => {
     // Clear the token by setting it to an expired value

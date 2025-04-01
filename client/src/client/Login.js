@@ -73,12 +73,13 @@ export default function Login () {
   
         
         if (response.ok) {
-          alert("Data Inserted Successfully!!!");
+          alert("Data Inserted SUccessfully!!!");
           setSuccess(data.message);
           navigate('/');
          
           
         } else {
+          alert(data.message)
           setError(data.message);  
         }
       } catch (err) {

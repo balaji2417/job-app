@@ -2,7 +2,7 @@
 import '../App.css';
 import neu from '../images/northeastern.jpg';
 import React ,{useState} from 'react';
-
+import { useAuthUser } from "./AuthContext";
 import { useNavigate } from 'react-router-dom';
 import jobImage from '../images/jobapp.jpg';
 import { Link } from 'react-router-dom';
@@ -11,7 +11,7 @@ function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  
+  const { login,error_new } = useAuthUser();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -26,34 +26,9 @@ function App() {
       setError('Both email and password are required!');
       return;
     }
-
-    try {
-      
-      const response = await fetch('http://localhost:5000/api/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json', // Specify that you're sending JSON
-        },
-        body: JSON.stringify({ email, password }), // Send email and password in the body
-    });
+    await login(email, password);
+    navigate('/joblist');
     
-      const data = await response.json();
-
-      
-      if (response.ok) {
-        navigate('/joblist');
-        
-       
-        
-      } else {
-        
-        setError(data.message);  
-      }
-    } catch (err) {
-      console.error('Error during login:', err);
-      
-      setError('An error occurred during login. Please try again later.');
-    }
   };
 
   return (
