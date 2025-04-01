@@ -10,7 +10,6 @@ const prisma = new PrismaClient();
 const app = express();
 
 // Middleware to parse JSON request bodies and cookies
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
@@ -40,8 +39,8 @@ const requireAuth = (req, res, next) => {
         if (err) {
             return res.status(401).json({ message: "Invalid token" });
         }
-        // Attach user info to request object
-        req.user = decoded;
+        // Attach user info to request object (match the structure in professor's example)
+        req.user = decoded; // Attach the decoded user info (id, email, etc.)
         next();
     });
 };
@@ -52,7 +51,6 @@ app.post('/api/register', async (req, res) => {
  
     // Validate that all required fields are provided
     if (!email || !password || !firstName || !lastName || !dob) {
-        
         return res.status(400).json({ message: "All fields are required." });
     }
  
@@ -96,6 +94,7 @@ app.post('/api/register', async (req, res) => {
         return res.status(500).json({ message: "Error creating user." });
     }
 });
+
 // POST endpoint: Login a user (without password hashing)
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
@@ -108,8 +107,7 @@ app.post('/api/login', async (req, res) => {
         // Find the user by email
         const user = await prisma.user.findUnique({
             where: { email: email },
-            select :{email:true,firstName:true},
-            
+            select: { email: true, firstName: true },
         });
 
         // Validate user and password (direct comparison)
@@ -128,25 +126,31 @@ app.post('/api/login', async (req, res) => {
         return res.status(500).json({ message: "Error during login" });
     }
 });
-app.get("/me", requireAuth, async (req, res) => {
 
-    const user = await prisma.user.findUnique({
-  
-      where: { email: req.email },
-  
-      select: { email: true, firstName: true },
-  
-    });
-  
-    res.json(user);
-  
-  });
-   
+// GET endpoint: Fetch authenticated user's data (using `requireAuth` middleware)
+app.get("/api/me", requireAuth, async (req, res) => {
+    try {
+        // Accessing `req.user.id` to find the authenticated user's data
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id },
+            select: { email: true, firstName: true }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error fetching user data" });
+    }
+});
+
 // POST endpoint: Logout a user (Clear token)
 app.post('/api/logout', (req, res) => {
     // Clear the token by setting it to an expired value
     res.clearCookie('token');
-    console.log(res);
     return res.status(200).json({ message: "Logged out successfully" });
 });
 
