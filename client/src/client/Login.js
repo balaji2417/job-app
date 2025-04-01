@@ -6,6 +6,7 @@ import RadioButtons from './RadioButtons';
 import { Link } from 'react-router-dom';
 
 export default function Login () {
+  
   return (
       <div>
 <div class="container-fluid" id="top-bar" >
@@ -37,6 +38,8 @@ export default function Login () {
   <h2 class = "cac" >Create an Account</h2>
       <form >
       <input type="text" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="username" name="username" placeholder="Username" required/>
+      <input type="text" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="FirstName" name="FirstName" placeholder="First Name" required/>
+      <input type="text" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="LastName" name="LastName" placeholder="Last Name" required/>
         <input type="password" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="password" name="password" placeholder="Password" required/>
         <input type="text" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="Id" name="Id" placeholder="Enter your MailId " required/>
         <input type="date" class="form-control" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}} id="Id" name="Id" placeholder="Enter your DOB " required/>

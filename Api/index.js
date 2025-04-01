@@ -1,5 +1,6 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
@@ -9,7 +10,8 @@ const prisma = new PrismaClient();
 const app = express();
 
 // Middleware to parse JSON request bodies and cookies
-app.use(bodyParser.json());
+app.use(cors());
+app.use(express.json());
 app.use(cookieParser());
 
 // Secret key for JWT (should be stored in an environment variable in production)
@@ -110,7 +112,7 @@ app.get('/api/protected', requireAuth, (req, res) => {
 });
 
 // Start the Express server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
