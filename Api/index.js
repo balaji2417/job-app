@@ -59,7 +59,20 @@ app.post('/api/register', async (req, res) => {
         console.log("Invalid date format. Use YYYY-MM-DD");
         return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD." });
     }
+    try {
+        // Check if the email is already in use
+        const existingUser = await prisma.user.findUnique({
+            where: { email: email }
+        });
  
+        if (existingUser) {
+            return res.status(409).json({ message: "Email is already registered. Please use a different email." });
+        }
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error creating user." });
+    }
     try {
         // Create a new user with validated dateOfBirth
         const newUser = await prisma.user.create({
