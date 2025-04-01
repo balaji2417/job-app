@@ -43,27 +43,41 @@ const requireAuth = (req, res, next) => {
 
 // POST endpoint: Register a new user (without hashing the password)
 app.post('/api/register', async (req, res) => {
-    const { email, password, firstName, lastName, dateOfBirth } = req.body;
-
-  
+    const { email, password, firstName, lastName, dob } = req.body;
+ 
+    // Validate that all required fields are provided
+    if (!email || !password || !firstName || !lastName || !dob) {
+        
+        return res.status(400).json({ message: "All fields are required." });
+    }
+ 
+    // Validate and parse the dateOfBirth
+    const parsedDate = new Date(dob);
+ 
+    // Check if the date is valid
+    if (isNaN(parsedDate.getTime())) {
+        console.log("Invalid date format. Use YYYY-MM-DD");
+        return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD." });
+    }
+ 
     try {
-        // Create a new user without hashing the password
+        // Create a new user with validated dateOfBirth
         const newUser = await prisma.user.create({
             data: {
                 email: email,
-                password: password,  // Storing the password in plaintext
+                password: password,  // Storing password in plaintext (not recommended)
                 firstName: firstName,
                 lastName: lastName,
-                dateOfBirth: new Date(dateOfBirth)
+                dateOfBirth: parsedDate  // Ensured valid Date object
             }
         });
+ 
         return res.status(201).json(newUser);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Error creating user." });
     }
 });
-
 // POST endpoint: Login a user (without password hashing)
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
