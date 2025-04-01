@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
     const fetchUserData = async () => {
       
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/me`, {
+        const res = await fetch(` http://localhost:5000/me`, {
           credentials: "include",
         });
 
@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/login`, {
+    const res = await fetch(`http://localhost:5000/login`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -62,7 +62,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await fetch(`${process.env.REACT_APP_API_URL}/logout`, {
+    await fetch(`http://localhost:5000/logout`, {
       method: "POST",
       credentials: "include",
     });
@@ -70,7 +70,7 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (email, password, name) => {
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/register`, {
+    const res = await fetch(`http://localhost:5000/register`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
