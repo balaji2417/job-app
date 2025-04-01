@@ -15,7 +15,8 @@ export default function Login () {
     const [lastName, setLastName] = useState('');
     const [dob,setDob] = useState('');
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    
+    const { register } = useAuthUser();
     const navigate = useNavigate();
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     
@@ -57,36 +58,9 @@ export default function Login () {
       }
 
 
-      
-  
-      try {
-        
-        const response = await fetch('http://localhost:5000/api/register', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json', // Specify that you're sending JSON
-          },
-          body: JSON.stringify({ email, password, firstName, lastName, dob }), // Send email and password in the body
-      });
-      
-        const data = await response.json();
-  
-        
-        if (response.ok) {
-          alert("Data Inserted SUccessfully!!!");
-          setSuccess(data.message);
-          navigate('/');
-         
-          
-        } else {
-          alert(data.message)
-          setError(data.message);  
-        }
-      } catch (err) {
-        console.error('Error during login:', err);
-        
-        setError('An error occurred during login. Please try again later.');
-      }
+      await register(email, password, firstName, lastName, dob);
+      navigate('/login');
+    
     };
   return (
       <div>

@@ -5,21 +5,21 @@ export const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [error,setError] = useState('');
+  const [error_call, setErrorCall] = useState('');
   const [user, setUser] = useState(null);
 
-
+  // Use effect to show an alert when error_call changes
+ 
   useEffect(() => {
-    alert(isAuthenticated);
+    
     const fetchUserData = async () => {
-      
+      setErrorCall('');
       try {
-        const res = await fetch(` http://localhost:5000/me`, {
+        const res = await fetch(` http://localhost:5000/api/me`, {
           credentials: "include",
         });
 
         if (res.ok) {
-          alert("Data okay");
           setIsAuthenticated(true);
           const data = await res.json();
         
@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
           setUser(null);
         }
       } catch (error) {
-        alert("Error, error");
+        
         console.error("Error fetching user data:", error);
 
       } finally {
@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const res = await fetch(`http://localhost:5000/login`, {
+    const res = await fetch('http://localhost:5000/api/login', {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -50,14 +50,18 @@ export function AuthProvider({ children }) {
 
     if (res.ok) {
       const userData = await res.json();
-      alert("Inside Login ?");
+      
       setIsAuthenticated(true);
       setUser(userData);
-      return "Correct";
+      setErrorCall('');
+      
+      
     } else {
+      
+      setErrorCall('Invalid Credentials');
       setIsAuthenticated(false);
       setUser(null);
-      SpeechSynthesisErrorEvent();
+      
     }
   };
 
@@ -79,7 +83,7 @@ export function AuthProvider({ children }) {
 
     if (res.ok) {
       const userData = await res.json();
-      alert("Inside Register:");
+      
       setIsAuthenticated(true);
       setUser(userData);
     } else {
@@ -90,7 +94,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, loading, user, login, register, logout }}
+      value={{ isAuthenticated, loading, user, login, register, logout,error_call }}
     >
       {children}
     </AuthContext.Provider>

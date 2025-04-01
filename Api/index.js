@@ -98,7 +98,7 @@ app.post('/api/register', async (req, res) => {
 // POST endpoint: Login a user (without password hashing)
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-
+    
     if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required." });
     }
@@ -106,15 +106,15 @@ app.post('/api/login', async (req, res) => {
     try {
         // Find the user by email
         const user = await prisma.user.findUnique({
-            where: { email: email },
+            where: { email: email,password: password },
             select: { email: true, firstName: true },
         });
-
+        
         // Validate user and password (direct comparison)
-        if (user && user.password === password) {
+        if (user) {
             // Generate JWT token
             const token = generateToken(user);
-
+            
             // Send token in a cookie
             res.cookie('token', token, { httpOnly: true, secure: false, maxAge: 3600000 }); // 1 hour expiry
             return res.status(200).json({ message: "Login successful", user });

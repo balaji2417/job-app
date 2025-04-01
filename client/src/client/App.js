@@ -10,15 +10,15 @@ import { Link } from 'react-router-dom';
 function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { login,error_new } = useAuthUser();
+  
+  const { login,error_call } = useAuthUser();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
    
-    setError('');
+    
    
 
     
@@ -28,6 +28,7 @@ function App() {
     }
     await login(email, password);
     navigate('/joblist');
+    
     
   };
 
@@ -60,7 +61,7 @@ function App() {
         }}>
   <div id="signup_in">
   <h2 class = "cac" >Log in</h2>
-  {error && <div style={{ color: 'red' }}>{error}</div>}
+  {error_call && <div style={{ color: 'red' }}>{error_call}</div>}
       <form onSubmit={handleSubmit}>
       <input type="text" style = {{width:"90%",   marginLeft:"20px",marginRight:"20px",justifyContent: 'center',}}class="form-control" id="username" name="username" placeholder="Username" required
       value={email}
@@ -74,7 +75,7 @@ function App() {
       </form>
       <div class="nav-links">
         <p >New user? 
-          <Link  to ="/login">Signup here
+          <Link  to ="/register">Signup here
           </Link>
         </p>
       </div>
