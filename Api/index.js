@@ -48,15 +48,16 @@ const requireAuth = (req, res, next) => {
 // POST endpoint: Register a new user (without hashing the password)
 app.post('/api/register', async (req, res) => {
     const { email, password, firstName, lastName, dob } = req.body;
- 
+    
     // Validate that all required fields are provided
     if (!email || !password || !firstName || !lastName || !dob) {
+       
         return res.status(400).json({ message: "All fields are required." });
     }
  
     // Validate and parse the dateOfBirth
     const parsedDate = new Date(dob);
-    console.log(email);
+    
     // Check if the date is valid
     if (isNaN(parsedDate.getTime())) {
         console.log("Invalid date format. Use YYYY-MM-DD");
@@ -69,6 +70,7 @@ app.post('/api/register', async (req, res) => {
         });
  
         if (existingUser) {
+            console.log("Existing User");
             return res.status(409).json({ message: "Email is already registered. Please use a different email." });
         }
     }

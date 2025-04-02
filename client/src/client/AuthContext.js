@@ -66,19 +66,20 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await fetch(`http://localhost:5000/logout`, {
+    await fetch(`http://localhost:5000/api/logout`, {
       method: "POST",
       credentials: "include",
     });
     setIsAuthenticated(false);
   };
 
-  const register = async (email, password, name) => {
-    const res = await fetch(`http://localhost:5000/register`, {
+  const register = async (email, password, firstName,lastName,dob) => {
+    
+    const res = await fetch(`http://localhost:5000/api/register`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, name }),
+      body: JSON.stringify({ email, password, firstName,lastName,dob }),
     });
 
     if (res.ok) {
