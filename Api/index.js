@@ -169,7 +169,7 @@ app.get('/api/protected', requireAuth, (req, res) => {
 app.post('/api/application', requireAuth, async (req, res) => {
     const { userId, jobListingId, status, dateApplied, dateUpdated, notes } = req.body;
 
-
+      
     
         // Create a new application linked to the userId provided in the request
         const newApplication = await prisma.application.create({

@@ -14,7 +14,7 @@ const JobListings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [jobs, setJobs] = useState([]);
   const navigate = useNavigate();
-  const { logout } = useAuthUser();
+  const { logout,user } = useAuthUser();
   const [error, setError] = useState(null);
 
   const fetchJobs = async () => {
@@ -48,9 +48,23 @@ const JobListings = () => {
       setIsLoading(false);
     }
   };
-  const markAsApplied = (id,description) => {
-    alert(id);
-    alert(description);
+  const markAsApplied = async (id,description) => {
+    
+    const today = new Date();
+    const userId = user.email;
+    const jobListingId = id;
+    const dateApplied = new Date();
+    const dateUpdated = new Date();
+    const notes = "Application for user";
+    
+    const status = 'Applied';
+    const res = await fetch('http://localhost:5000/api/application', {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({  userId, jobListingId, status, dateApplied, dateUpdated, notes }),
+    });
+    alert("Data Inserted...");
   };
 
   const handleSearch = (e) => {
