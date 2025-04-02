@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../JobListings.css';
 import '../App.css';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuthUser } from "./AuthContext";
 import neu from '../images/northeastern.jpg';
 import jobImage from '../images/jobapp.jpg';
 
@@ -13,7 +14,7 @@ const JobListings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [jobs, setJobs] = useState([]);
   const navigate = useNavigate();
-  
+  const { logout } = useAuthUser();
   const [error, setError] = useState(null);
 
   const fetchJobs = async () => {
@@ -70,29 +71,8 @@ const JobListings = () => {
     fetchJobs();
   }, [currentQuery, currentLocation]);
   const handleLogout = async () => {
-    try {
-        const response = await fetch('http://localhost:5000/api/logout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include', // This sends cookies if any (necessary for cookie-based sessions)
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            // Success: Show a message and redirect to login
-            alert(data.message); // "Logged out successfully"
-            navigate('/login'); // Redirect user to the login page
-        } else {
-            // Handle any errors
-            alert("Logout failed: " + data.message);
-        }
-    } catch (error) {
-        console.error("Error during logout:", error);
-        alert("An error occurred during logout.");
-    }
+    await logout();
+    navigate('/login');
 };
   return (
     <div>

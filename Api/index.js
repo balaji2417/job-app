@@ -56,7 +56,7 @@ app.post('/api/register', async (req, res) => {
  
     // Validate and parse the dateOfBirth
     const parsedDate = new Date(dob);
- 
+    console.log(email);
     // Check if the date is valid
     if (isNaN(parsedDate.getTime())) {
         console.log("Invalid date format. Use YYYY-MM-DD");
