@@ -163,6 +163,36 @@ app.get('/api/protected', requireAuth, (req, res) => {
     res.status(200).json({ message: "Protected route accessed", user: req.user });
 });
 
+
+
+// POST endpoint: Create a new application (with userId passed in the request)
+app.post('/api/application', requireAuth, async (req, res) => {
+    const { userId, jobListingId, status, dateApplied, dateUpdated, notes } = req.body;
+
+
+    
+        // Create a new application linked to the userId provided in the request
+        const newApplication = await prisma.application.create({
+            data: {
+                userId: userId, // Use the userId passed in the request
+                jobListingId: jobListingId,
+                status: status,
+                dateApplied: new Date(dateApplied), // Ensure the date is in correct format
+                dateUpdated: dateUpdated ? new Date(dateUpdated) : null, // Optional field, convert to date if provided
+                notes: notes || null, // Optional field
+            }
+        });
+
+        // Return the newly created application as response
+        return res.status(201).json(newApplication);
+    } 
+);
+
+
+
+
+
+
 // Start the Express server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
