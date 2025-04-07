@@ -1,10 +1,10 @@
 
-import '../App.css';
-import neu from '../images/northeastern.jpg';
+import './App.css';
+import neu from './images/northeastern.jpg';
 import React ,{useState} from 'react';
 import { useAuthUser } from "./AuthContext";
 import { useNavigate } from 'react-router-dom';
-import jobImage from '../images/jobapp.jpg';
+import jobImage from './images/jobapp.jpg';
 import { Link } from 'react-router-dom';
 
 function App() {

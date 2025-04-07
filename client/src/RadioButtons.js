@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../App.css';
+import './App.css';
 const RadioButtons = () => {
   // State to hold the selected radio button value
   const [selectedOption, setSelectedOption] = useState('');

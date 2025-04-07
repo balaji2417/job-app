@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import '../JobListings.css';
-import '../App.css';
+import './JobListings.css';
+import './App.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthUser } from "./AuthContext";
-import neu from '../images/northeastern.jpg';
-import jobImage from '../images/jobapp.jpg';
+import neu from './images/northeastern.jpg';
+
 
 const JobListings = () => {
   const RAPIDAPI_KEY = '7ccc597d8dmsh9c6142f89f1c247p104a9ejsn06f611acc57a';
@@ -36,6 +36,7 @@ const JobListings = () => {
         throw new Error(`Failed to fetch jobs: ${response.statusText}`);
       }
 
+      
       const data = await response.json();
       setJobs(data.data || []);
       
@@ -94,6 +95,7 @@ const JobListings = () => {
     
     <div class="container-fluid" id="top-bar" >
         <div class="row">
+          <p> Welcome {user.email} </p>
           <div class="col-sm text-center">
             <img src={neu} alt="Husky Logo"/>
           </div>

@@ -1,7 +1,7 @@
 
-import '../App.css';
-import neu from '../images/northeastern.jpg';
-import jobImage from '../images/jobapp.jpg';
+import './App.css';
+import neu from './images/northeastern.jpg';
+import jobImage from './images/jobapp.jpg';
 import { useAuthUser } from "./AuthContext";
 import RadioButtons from './RadioButtons';
 import React ,{useState} from 'react';

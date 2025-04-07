@@ -1,9 +1,8 @@
-import '../App.css';
-import neu from '../images/northeastern.jpg';
-import jobImage from '../images/jobapp.jpg';
-import RadioButtons from './RadioButtons';
+import './App.css';
+import neu from './images/northeastern.jpg';
+
 import React ,{useState} from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { Link } from 'react-router-dom';
 
 export default function Home () {

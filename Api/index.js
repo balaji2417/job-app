@@ -45,6 +45,9 @@ const requireAuth = (req, res, next) => {
     });
 };
 
+app.get("/ping", (req, res) => {
+  res.send("pong");
+});
 // POST endpoint: Register a new user (without hashing the password)
 app.post('/api/register', async (req, res) => {
     const { email, password, firstName, lastName, dob } = req.body;
@@ -129,6 +132,31 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// Check if the job is already applied.
+app.post('/api/checkJob', async (req, res) => {
+    const { jobListingId, userId } = req.body;
+    
+  
+
+    try {
+        // Find the user by email
+        const application = await prisma.application.findUnique({
+            where: {jobListingId: jobListingId,userId: userId },
+            
+        });
+        
+        // Validate user and password (direct comparison)
+        if (application) {
+            
+            return res.status(200).json({ message: "Application exists" });
+        } else {
+            return res.status(401).json({ message: "Application does not exists" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error during Connection" });
+    }
+});
 // GET endpoint: Fetch authenticated user's data (using `requireAuth` middleware)
 app.get("/api/me", requireAuth, async (req, res) => {
     try {
