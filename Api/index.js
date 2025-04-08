@@ -23,7 +23,7 @@ const JWT_SECRET = '][q,s^z4X_J|5c[';
 
 // Helper function to generate JWT
 const generateToken = (user) => {
-    return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign({ email: user.email }, JWT_SECRET, { expiresIn: '1h' }); // Include email in JWT payload
 };
 
 // Middleware to require authentication using token
@@ -40,47 +40,44 @@ const requireAuth = (req, res, next) => {
             return res.status(401).json({ message: "Invalid token" });
         }
         // Attach user info to request object (match the structure in professor's example)
-        req.user = decoded; // Attach the decoded user info (id, email, etc.)
+        req.user = decoded; // Attach the decoded user info (email)
         next();
     });
 };
 
-app.get("/ping", (req, res) => {
-  res.send("pong");
-});
 // POST endpoint: Register a new user (without hashing the password)
 app.post('/api/register', async (req, res) => {
     const { email, password, firstName, lastName, dob } = req.body;
-    
+
     // Validate that all required fields are provided
     if (!email || !password || !firstName || !lastName || !dob) {
-       
         return res.status(400).json({ message: "All fields are required." });
     }
- 
+
     // Validate and parse the dateOfBirth
     const parsedDate = new Date(dob);
-    
+
     // Check if the date is valid
     if (isNaN(parsedDate.getTime())) {
         console.log("Invalid date format. Use YYYY-MM-DD");
         return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD." });
     }
+
     try {
         // Check if the email is already in use
         const existingUser = await prisma.user.findUnique({
             where: { email: email }
         });
- 
+
         if (existingUser) {
             console.log("Existing User");
             return res.status(409).json({ message: "Email is already registered. Please use a different email." });
         }
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Error creating user." });
     }
+
     try {
         // Create a new user with validated dateOfBirth
         const newUser = await prisma.user.create({
@@ -92,7 +89,7 @@ app.post('/api/register', async (req, res) => {
                 dateOfBirth: parsedDate  // Ensured valid Date object
             }
         });
- 
+
         return res.status(201).json(newUser);
     } catch (error) {
         console.error(error);
@@ -103,24 +100,32 @@ app.post('/api/register', async (req, res) => {
 // POST endpoint: Login a user (without password hashing)
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    
+
     if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required." });
     }
 
+    // ADD THIS CHECK: If there's already a valid token for a different user, block login
+    const existingToken = req.cookies.token;
+    if (existingToken) {
+        try {
+            const decoded = jwt.verify(existingToken, JWT_SECRET);
+            if (decoded.email !== email) {
+                return res.status(403).json({ message: "Another user is already logged in. Please logout first." });
+            }
+        } catch (err) {
+            // Token is invalid or expired — allow new login
+        }
+    }
+
     try {
-        // Find the user by email
         const user = await prisma.user.findUnique({
-            where: { email: email,password: password },
-            select: { email: true, firstName: true },
+            where: { email: email },
+            select: { email: true, firstName: true, password: true },
         });
-        
-        // Validate user and password (direct comparison)
-        if (user) {
-            // Generate JWT token
+
+        if (user && user.password === password) {
             const token = generateToken(user);
-            
-            // Send token in a cookie
             res.cookie('token', token, { httpOnly: true, secure: false, maxAge: 3600000 }); // 1 hour expiry
             return res.status(200).json({ message: "Login successful", user });
         } else {
@@ -132,40 +137,15 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Check if the job is already applied.
-app.post('/api/checkJob', async (req, res) => {
-    const { jobListingId, userId } = req.body;
-    
-  
-
-    try {
-        // Find the user by email
-        const application = await prisma.application.findUnique({
-            where: {jobListingId: jobListingId,userId: userId },
-            
-        });
-        
-        // Validate user and password (direct comparison)
-        if (application) {
-            
-            return res.status(200).json({ message: "Application exists" });
-        } else {
-            return res.status(401).json({ message: "Application does not exists" });
-        }
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error during Connection" });
-    }
-});
 // GET endpoint: Fetch authenticated user's data (using `requireAuth` middleware)
 app.get("/api/me", requireAuth, async (req, res) => {
     try {
-        // Accessing `req.user.id` to find the authenticated user's data
+        // Accessing `req.user.email` to find the authenticated user's data
         const user = await prisma.user.findUnique({
-            where: { id: req.user.id },
+            where: { email: req.user.email },
             select: { email: true, firstName: true }
         });
-        console.log("User : ",user.email);
+        console.log("User : ", user.email);
         if (!user) {
             console.log("Not Found!");
             return res.status(404).json({ error: "User not found" });
@@ -191,35 +171,25 @@ app.get('/api/protected', requireAuth, (req, res) => {
     res.status(200).json({ message: "Protected route accessed", user: req.user });
 });
 
-
-
 // POST endpoint: Create a new application (with userId passed in the request)
 app.post('/api/application', requireAuth, async (req, res) => {
-    const { userId, jobListingId, status, dateApplied, dateUpdated, notes } = req.body;
+    const { jobListingId, status, dateApplied, dateUpdated, notes } = req.body;
 
-      
-    
-        // Create a new application linked to the userId provided in the request
-        const newApplication = await prisma.application.create({
-            data: {
-                userId: userId, // Use the userId passed in the request
-                jobListingId: jobListingId,
-                status: status,
-                dateApplied: new Date(dateApplied), // Ensure the date is in correct format
-                dateUpdated: dateUpdated ? new Date(dateUpdated) : null, // Optional field, convert to date if provided
-                notes: notes || null, // Optional field
-            }
-        });
+    // Create a new application linked to the userId from the JWT (email)
+    const newApplication = await prisma.application.create({
+        data: {
+            userId: req.user.email,  // Use the email from the JWT
+            jobListingId: jobListingId,
+            status: status,
+            dateApplied: new Date(dateApplied), // Ensure the date is in correct format
+            dateUpdated: dateUpdated ? new Date(dateUpdated) : null, // Optional field, convert to date if provided
+            notes: notes || null, // Optional field
+        }
+    });
 
-        // Return the newly created application as response
-        return res.status(201).json(newApplication);
-    } 
-);
-
-
-
-
-
+    // Return the newly created application as response
+    return res.status(201).json(newApplication);
+});
 
 // Start the Express server
 const PORT = process.env.PORT || 5000;

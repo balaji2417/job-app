@@ -26,12 +26,13 @@ export default function Login () {
       const today = new Date();
       const dob_inter = new Date(dob);
       let age = today.getFullYear() - dob_inter.getFullYear();
-        const monthDifference = today.getMonth() - dob_inter.getMonth();
-
-        // If the birthday hasn't happened yet this year, subtract 1 from age
-        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < dob.getDate())) {
-            age--;
-        }
+      const monthDifference = today.getMonth() - dob_inter.getMonth();
+      
+      // ✅ FIXED LINE
+      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < dob_inter.getDate())) {
+          age--;
+      }
+      
       
       setError('');
       

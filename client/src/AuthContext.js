@@ -60,7 +60,7 @@ export function AuthProvider({ children }) {
       
     } else {
       
-      setErrorCall('Invalid Credentials');
+      setErrorCall('user is already logged in, sorry!');
       setIsAuthenticated(false);
       setUser(null);
       

@@ -85,10 +85,34 @@ const JobListings = () => {
   useEffect(() => {
     fetchJobs();
   }, [currentQuery, currentLocation]);
+
+
   const handleLogout = async () => {
     await logout();
     navigate('/login');
+
+    // Clear local storage or any session storage (optional)
+    window.localStorage.removeItem("user");
+
+    // Optional: Broadcast a message to other tabs
+    window.dispatchEvent(new Event('storage'));
 };
+
+// Listen for storage events to auto logout in other tabs
+useEffect(() => {
+    const handleStorageChange = () => {
+        if (!localStorage.getItem("user")) {
+            logout();
+            navigate("/login");
+        }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+        window.removeEventListener('storage', handleStorageChange);
+    };
+}, [navigate, logout]);
+
   return (
     <div>
 
