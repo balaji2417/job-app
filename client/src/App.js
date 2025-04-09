@@ -6,18 +6,23 @@ import { useAuthUser } from "./AuthContext";
 import { useNavigate } from 'react-router-dom';
 import jobImage from './images/jobapp.jpg';
 import { Link } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
-  const { login,error_call } = useAuthUser();
+  const { login,error_call,isAuthenticated } = useAuthUser();
   const navigate = useNavigate();
 
+  
+   if(isAuthenticated) {
+    navigate('/joblist');
+   }
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-   
+    
     
    
 

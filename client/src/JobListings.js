@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './JobListings.css';
 import './App.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuthUser } from "./AuthContext";
-import neu from './images/northeastern.jpg';
+
+
+
 
 
 const JobListings = () => {
@@ -65,7 +67,15 @@ const JobListings = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({  userId, jobListingId, status, dateApplied, dateUpdated, notes }),
     });
-    alert("Data Inserted...");
+    
+    if(res.ok) {
+      alert("Data Inserted...");
+    } 
+    else{
+      const data = await res.json();
+      alert(data.message);
+    }
+    
   };
 
   const handleSearch = (e) => {
@@ -87,16 +97,7 @@ const JobListings = () => {
   }, [currentQuery, currentLocation]);
 
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login');
 
-    // Clear local storage or any session storage (optional)
-    window.localStorage.removeItem("user");
-
-    // Optional: Broadcast a message to other tabs
-    window.dispatchEvent(new Event('storage'));
-};
 
 // Listen for storage events to auto logout in other tabs
 useEffect(() => {
@@ -117,20 +118,7 @@ useEffect(() => {
     <div>
 
     
-    <div class="container-fluid" id="top-bar" >
-        <div class="row">
-          <p> Welcome {user.email} </p>
-          <div class="col-sm text-center">
-            <img src={neu} alt="Husky Logo"/>
-          </div>
-          <div class="col-sm text-center">
-            <h1 class="Name">Job Portal</h1>
-          </div>
-          <div class="col-sm">
-          <button type="submit" style = {{width:"50%"}} class="btn "id = "btn-signup" onClick={handleLogout}>Log Out</button>
-          </div>
-        </div>
-      </div>
+  
       <div className="job-listings-container">
       <h1 className="title">Job Listings</h1>
 

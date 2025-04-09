@@ -59,8 +59,8 @@ export function AuthProvider({ children }) {
       
       
     } else {
-      
-      setErrorCall('user is already logged in, sorry!');
+      const data = await res.json();
+      setErrorCall(data.message);
       setIsAuthenticated(false);
       setUser(null);
       

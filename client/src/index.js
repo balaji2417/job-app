@@ -4,10 +4,12 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
  
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './AuthContext'; // Import Auth Context
 import Login from './Login';
+import TopNav from './TopNav';
 import Home from './Home';
 import RequireAuth from './RequireAuth'
 import JobListings from './JobListings';
@@ -25,11 +27,13 @@ root.render(
 <Route path="register" element={<Login />} />
 <Route path="joblist" element={
     <RequireAuth>
-         <JobListings />
+         <TopNav/>
     </RequireAuth>
     
     
-    } />
+    } >
+    <Route index element = { <JobListings />}/>
+</Route>
 </Routes>
 </BrowserRouter>
 </AuthProvider>
