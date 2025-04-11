@@ -145,9 +145,9 @@ app.get("/api/me", requireAuth, async (req, res) => {
             where: { email: req.user.email },
             select: { email: true, firstName: true }
         });
-        console.log("User : ", user.email);
+       
         if (!user) {
-            console.log("Not Found!");
+            
             return res.status(404).json({ error: "User not found" });
         }
 

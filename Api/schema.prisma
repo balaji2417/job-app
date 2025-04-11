@@ -45,3 +45,8 @@ model PerformanceMetrics {
 
   @@id([userId, platformName]) // Composite primary key: userId and platformName must be unique together
 }
+
+model platformName {
+  platformName    String             @id @unique
+  createdDate     DateTime
+}

@@ -18,6 +18,12 @@ const TopNav = () => {
         // Optional: Broadcast a message to other tabs
         window.dispatchEvent(new Event('storage'));
     };
+    const gotoProfile = async () => {
+      navigate('/joblist/profile');
+  };
+  const gotoHomeJob = async () => {
+    navigate('/joblist');
+};
     return (
     <div class="container-fluid" id="top-bar-profile" >
     <div class="row">
@@ -29,14 +35,15 @@ const TopNav = () => {
       </div>
       <div class="col-sm">
       <Dropdown>
-  <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+  <Dropdown.Toggle variant="dark" id="dropdown-basic">
     Good Day {user.firstName}
   </Dropdown.Toggle>
 
   <Dropdown.Menu>
-    <Dropdown.Item href="#/action-1">Profile</Dropdown.Item>
+  <Dropdown.Item onClick={gotoHomeJob} >Home</Dropdown.Item>
+    <Dropdown.Item onClick={gotoProfile}>Profile</Dropdown.Item>
     <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
-    <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+    
   </Dropdown.Menu>
 </Dropdown>
       </div>
