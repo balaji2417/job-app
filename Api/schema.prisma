@@ -8,14 +8,14 @@ datasource db {
 }
 
 model User {
-  email             String             @id @unique
-  password          String
-  firstName         String
-  lastName          String
-  dateOfBirth       DateTime
+  email              String               @id @unique
+  password           String
+  firstName          String
+  lastName           String
+  dateOfBirth        DateTime
 
-  applications      Application[]      // One-to-many relationship with Application
-  performanceMetrics PerformanceMetrics[] // One-to-many relationship with PerformanceMetrics
+  applications       Application[]
+  performanceMetrics PerformanceMetrics[]
 }
 
 model Application {
@@ -26,9 +26,9 @@ model Application {
   dateUpdated   DateTime?
   notes         String?
 
-  user          User   @relation(fields: [userId], references: [email], onDelete: Cascade)  // Updated reference to email
+  user          User   @relation(fields: [userId], references: [email], onDelete: Cascade)
 
-  @@id([userId, jobListingId]) // Composite primary key: userId and jobListingId must be unique together
+  @@id([userId, jobListingId])
 }
 
 model PerformanceMetrics {
@@ -41,12 +41,15 @@ model PerformanceMetrics {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  user            User   @relation(fields: [userId], references: [email], onDelete: Cascade)  // Updated reference to email
+  user            User         @relation(fields: [userId], references: [email], onDelete: Cascade)
+  platform        platformName @relation(fields: [platformName], references: [platformName], onDelete: Cascade)
 
-  @@id([userId, platformName]) // Composite primary key: userId and platformName must be unique together
+  @@id([userId, platformName])
 }
 
 model platformName {
-  platformName    String             @id @unique
+  platformName    String              @id @unique
   createdDate     DateTime
+
+  performanceMetrics PerformanceMetrics[]
 }
