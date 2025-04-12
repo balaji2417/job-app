@@ -117,11 +117,34 @@ img {
   color: white;
 }
 #top-bar-profile {
-  
-
-  padding: 10px 0; 
-  
+  background-color: black;
+  padding: 10px 0;
+  color: white;
+  font-family: 'Georgia', 'Times New Roman', Times, serif;
 }
+
+#top-bar-profile .job-portal-title {
+  color: white;
+  font-size: 2rem;
+  font-weight: normal;
+}
+
+#top-bar-profile .dropdown-toggle {
+  color: white !important;
+}
+
+#top-bar-profile .dropdown-menu {
+  background-color: white;
+}
+
+#top-bar-profile .dropdown-item {
+  color: black;
+}
+
+#top-bar-profile .dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
 .App-link {
   color: #61dafb;
 }

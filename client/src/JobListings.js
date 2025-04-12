@@ -51,7 +51,7 @@ const JobListings = () => {
       setIsLoading(false);
     }
   };
-  const markAsApplied = async (id,description) => {
+  const markAsApplied = async (id,description,title) => {
     
     const today = new Date();
     const userId = user.email;
@@ -60,12 +60,13 @@ const JobListings = () => {
     const dateUpdated = new Date();
     const notes = "Application for user";
     
+    
     const status = 'Applied';
     const res = await fetch('http://localhost:5000/api/application', {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({  userId, jobListingId, status, dateApplied, dateUpdated, notes }),
+      body: JSON.stringify({  userId, jobListingId, status, dateApplied, dateUpdated, notes, title }),
     });
     
     if(res.ok) {
@@ -177,7 +178,7 @@ useEffect(() => {
                     Apply Now
                   </a>
                   <button 
-                  onClick={() => markAsApplied(job.job_id,job.job_description)}
+                  onClick={() => markAsApplied(job.job_id,job.job_description,job.job_title)}
                   className="mark-applied"
                 >
                   Mark as Applied
