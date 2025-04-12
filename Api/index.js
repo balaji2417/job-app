@@ -184,6 +184,7 @@ app.post('/api/application', requireAuth, async (req, res) => {
             dateApplied: new Date(dateApplied), // Ensure the date is in correct format
             dateUpdated: dateUpdated ? new Date(dateUpdated) : null, // Optional field, convert to date if provided
             notes: notes || null, // Optional field
+            jobName: jobName,
         }
     });
 
