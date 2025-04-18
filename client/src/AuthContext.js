@@ -121,11 +121,7 @@ const updateRecord = async  (email,value,id) => {
     if (res.ok) {
       const userData = await res.json();
       
-      setIsAuthenticated(true);
-      setUser(userData);
-    } else {
-      setIsAuthenticated(false);
-      setUser(null);
+     
     }
   };
 
