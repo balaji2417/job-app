@@ -25,7 +25,12 @@ model Application {
   dateApplied   DateTime
   dateUpdated   DateTime?
   notes         String?
-  jobName       String //  This is the new field
+  jobName       String
+  jobLink       String?     // new field
+  companyName   String?     // new field
+
+  platformName String?    // Foreign key field (must be scalar)
+  platform       platformName? @relation(fields: [platformName], references: [platformName], onDelete: SetNull)
 
   user          User   @relation(fields: [userId], references: [email], onDelete: Cascade)
 
@@ -49,8 +54,9 @@ model PerformanceMetrics {
 }
 
 model platformName {
-  platformName    String              @id @unique
-  createdDate     DateTime
+  platformName        String               @id @unique
+  createdDate         DateTime
 
-  performanceMetrics PerformanceMetrics[]
+  performanceMetrics  PerformanceMetrics[]
+  applications        Application[]        // inverse relation (no need to name it unless needed)
 }
