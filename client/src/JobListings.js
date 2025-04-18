@@ -1,198 +1,299 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './JobListings.css';
-import './App.css';
-import { useNavigate } from 'react-router-dom';
-import { useAuthUser } from "./AuthContext";
-
-
-
-
 
 const JobListings = () => {
-  const RAPIDAPI_KEY = '7ccc597d8dmsh9c6142f89f1c247p104a9ejsn06f611acc57a';
-  const [currentQuery, setCurrentQuery] = useState('developer');
-  const [currentLocation, setCurrentLocation] = useState('');
-  const [message, setMessage] = useState('Good Morning');
-  const [isLoading, setIsLoading] = useState(false);
-  const [jobs, setJobs] = useState([]);
-  const navigate = useNavigate();
-  const { logout,user } = useAuthUser();
-  const [error, setError] = useState(null);
-
-  const fetchJobs = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const url = `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(currentQuery)}${currentLocation ? '%20in%20' + encodeURIComponent(currentLocation) : ''}&page=1&num_pages=1`;
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'X-RapidAPI-Key': RAPIDAPI_KEY,
-          'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch jobs: ${response.statusText}`);
-      }
-
-      
-      const data = await response.json();
-      setJobs(data.data || []);
-      
-      if (!data.data || data.data.length === 0) {
-        setError('No jobs found matching your criteria');
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  const markAsApplied = async (id,description,title) => {
-    
-    const today = new Date();
-    const userId = user.email;
-    const jobListingId = id;
-    const dateApplied = new Date();
-    const dateUpdated = new Date();
-    const notes = "Application for user";
-    
-    
-    const status = 'Applied';
-    const res = await fetch('http://localhost:5000/api/application', {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({  userId, jobListingId, status, dateApplied, dateUpdated, notes, title }),
+    const RAPIDAPI_KEY = '739f4954b0mshbd8df681ece270ep1c2256jsn577086b56c18'; 
+    const [jobs, setJobs] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [selectedJob, setSelectedJob] = useState(null);
+    const [filters, setFilters] = useState({
+        title: '',
+        location: '',
+        platform: 'LinkedIn'
     });
-    
-    if(res.ok) {
-      alert("Data Inserted...");
-    } 
-    else{
-      const data = await res.json();
-      alert(data.message);
-    }
-    
-  };
+    const [searchExecuted, setSearchExecuted] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [jobCache, setJobCache] = useState({});
+    const [appliedJobs, setAppliedJobs] = useState(new Set()); 
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const query = document.getElementById('jobQuery').value.trim();
-    const location = document.getElementById('location').value.trim();
+    const platforms = [
+        { value: 'LinkedIn', label: 'LinkedIn' },
+        { value: 'Indeed', label: 'Indeed' },
+        { value: 'Glassdoor', label: 'Glassdoor' },
+    ];
 
-    if (!query) {
-      setError('Please enter a job title');
-      return;
-    }
+    const fetchJobs = useCallback(async (pageNumber = 1, title = '', location = '') => {
+        const cacheKey = `${pageNumber}-${title}-${location}`;
 
-    setCurrentQuery(query);
-    setCurrentLocation(location);
-  };
-
-  useEffect(() => {
-    fetchJobs();
-  }, [currentQuery, currentLocation]);
-
-
-
-
-// Listen for storage events to auto logout in other tabs
-useEffect(() => {
-    const handleStorageChange = () => {
-        if (!localStorage.getItem("user")) {
-            logout();
-            navigate("/login");
+        if (jobCache[cacheKey]) {
+            setJobs(jobCache[cacheKey]);
+            setCurrentPage(pageNumber);
+            setSelectedJob(null);
+            setError(null);
+            setLoading(false);
+            return;
         }
+
+        setLoading(true);
+        setError(null);
+        setSelectedJob(null);
+
+        try {
+            let query = '';
+            if (title && location) {
+                query = `${title} jobs in ${location}`;
+            } else if (title) {
+                query = `${title} jobs`;
+            } else if (location) {
+                query = `jobs in ${location}`;
+            } else {
+                query = 'jobs';
+            }
+
+            const url = `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(query)}&page=${pageNumber}`;
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-RapidAPI-Key': RAPIDAPI_KEY,
+                    'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`Failed to fetch jobs (Status: ${response.status})`);
+            }
+
+            const data = await response.json();
+
+            if (data && data.status === "OK" && Array.isArray(data.data)) {
+                setJobs(data.data);
+                setCurrentPage(pageNumber);
+                setJobCache(prevCache => ({ ...prevCache, [cacheKey]: data.data }));
+            } else {
+                setJobs([]);
+                setJobCache(prevCache => ({ ...prevCache, [cacheKey]: [] }));
+            }
+
+        } catch (err) {
+            setError(err.message);
+            setJobs([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [RAPIDAPI_KEY, jobCache]);
+
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
     };
-    window.addEventListener('storage', handleStorageChange);
 
-    return () => {
-        window.removeEventListener('storage', handleStorageChange);
+    const handleSearch = (e) => {
+        e.preventDefault();
+        setSearchExecuted(true);
+        setSelectedJob(null);
+        setJobCache({});
+        fetchJobs(1, filters.title, filters.location);
     };
-}, [navigate, logout]);
 
-  return (
-    <div>
+    const handleReset = () => {
+        setFilters({ title: '', location: '', platform: 'LinkedIn' });
+        setSearchExecuted(false);
+        setSelectedJob(null);
+        setJobCache({});
+        fetchJobs(1);
+    };
 
-    
-  
-      <div className="job-listings-container">
-      <h1 className="title">Job Listings</h1>
+    useEffect(() => {
+        fetchJobs(1, filters.title, filters.location);
+    }, []);
 
-      <form className="search-container" onSubmit={handleSearch}>
-        <input
-          type="text"
-          id="jobQuery"
-          defaultValue={currentQuery}
-          placeholder="Job title (e.g. 'developer')"
-          className="search-input"
-        />
-        <input
-          type="text"
-          id="location"
-          defaultValue={currentLocation}
-          placeholder="Location (e.g. 'canada')"
-          className="search-input"
-        />
-        <button type="submit" className="search-button">
-          {isLoading ? 'Searching...' : 'Search Jobs'}
-        </button>
-      </form>
+    const handleNextPage = () => {
+        if (!loading) fetchJobs(currentPage + 1, filters.title, filters.location);
+    };
 
-      {error && <div className="error-message">{error}</div>}
+    const handlePrevPage = () => {
+        if (currentPage > 1 && !loading) fetchJobs(currentPage - 1, filters.title, filters.location);
+    };
 
-      {isLoading ? (
-        <div className="loading">
-          <div className="spinner">Loading jobs...</div>
-        </div>
-      ) : (
-        <div className="jobs-container">
-          {jobs.map((job, index) => (
-            <div className="job" key={index}>
-              <h2>{job.job_title || 'No title available'}</h2>
-              <h3>{job.employer_name || 'Company not specified'}</h3>
-              <div className="job-meta">
-                {job.job_country && <span>📍 {job.job_country}</span>}
-                {job.job_employment_type && <span>🕒 {job.job_employment_type}</span>}
-                {job.job_posted_at_timestamp && (
-                  <span>📅 {new Date(job.job_posted_at_timestamp * 1000).toLocaleDateString()}</span>
-                )}
-                {job.job_is_remote && <span>🏠 Remote</span>}
-              </div>
-              {job.job_salary && <p><strong>Salary:</strong> {job.job_salary}</p>}
-              <p className="job-description">
-                {job.job_description ? job.job_description.substring(0, 250) + '...' : 'No description available'}
-              </p>
-              {job.job_apply_link && (
-                <div className="apply-actions">
-                  <a 
-                    href={job.job_apply_link} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="apply-link"
-                  >
-                    Apply Now
-                  </a>
-                  <button 
-                  onClick={() => markAsApplied(job.job_id,job.job_description,job.job_title)}
-                  className="mark-applied"
-                >
-                  Mark as Applied
-                </button>
-                </div>
-              )}
+    const filteredJobs = jobs.filter(job => {
+        return job.apply_options?.some(
+            option => option.publisher?.toLowerCase().includes(filters.platform.toLowerCase())
+        ) || false;
+    });
+
+    const getPlatformLinks = (job) => {
+        if (!job || !job.apply_options) return [];
+
+        const allowedPlatforms = ['LinkedIn', 'Indeed', 'Glassdoor'];
+
+        return job.apply_options.filter(option => {
+            const publisher = option.publisher?.toLowerCase();
+            const isAllowed = allowedPlatforms.some(p => publisher?.includes(p.toLowerCase()));
+            return publisher?.includes(filters.platform.toLowerCase()) && option.apply_link;
+        });
+    };
+
+    const formatDate = (timestamp) => {
+        if (!timestamp) return 'N/A';
+        const date = new Date(timestamp * 1000);
+        return date.toLocaleDateString();
+    };
+
+    const handleMarkAsApplied = (jobId) => {
+        setAppliedJobs(prev => new Set(prev).add(jobId));
+    };
+
+    const isJobApplied = (jobId) => {
+        return appliedJobs.has(jobId);
+    };
+
+    return (
+        <div className="job-listings-container">
+            <div className="filters">
+                <h2>Find Your Dream Job</h2>
+                <form onSubmit={handleSearch}>
+                    <div className="filter-group">
+                        <input type="text" name="title" placeholder="Job title (optional)" value={filters.title} onChange={handleFilterChange} disabled={loading} />
+                        <input type="text" name="location" placeholder="Location (optional)" value={filters.location} onChange={handleFilterChange} disabled={loading} />
+                        <select name="platform" value={filters.platform} onChange={handleFilterChange} disabled={loading}>
+                            {platforms.map(platform => (
+                                <option key={platform.value} value={platform.value}>{platform.label}</option>
+                            ))}
+                        </select>
+                        <button type="submit" className="search-button" disabled={loading}>{loading && currentPage === 1 && searchExecuted ? 'Searching...' : 'Search Jobs'}</button>
+                        <button type="button" className="reset-button" onClick={handleReset} disabled={loading}>Reset</button>
+                    </div>
+                </form>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
 
-    </div>
-  );
+            {loading && <div className="loading">Loading Page {currentPage}...</div>}
+            {error && <div className="error">Error: {error}</div>}
+
+            {!loading && !error && (
+                <>
+                    {selectedJob ? (
+                        <div className="job-detail">
+                            <button className="back-button" onClick={() => setSelectedJob(null)}>&larr; Back to listings (Page {currentPage})</button>
+                            <div className="job-detail-card">
+                                <div className="job-header">
+                                    <h2>{selectedJob.job_title}</h2>
+                                    <h3>{selectedJob.employer_name}</h3>
+                                    <p className="location">{selectedJob.job_city}{selectedJob.job_state ? `, ${selectedJob.job_state}` : ''} {selectedJob.job_country}</p>
+                                    {selectedJob.job_is_remote && <p className="remote-tag">Remote</p>}
+                                    <p className="posted-date">Posted: {formatDate(selectedJob.job_posted_at_timestamp)}{selectedJob.job_offer_expiration_timestamp && ` | Expires: ${formatDate(selectedJob.job_offer_expiration_timestamp)}`}</p>
+                                    {selectedJob.job_employment_type && <p className="employment-type">{selectedJob.job_employment_type}</p>}
+                                </div>
+                                <div className="job-content">
+                                    <div className="job-description">
+                                        <h4>Job Description</h4>
+                                        <p style={{ whiteSpace: 'pre-wrap' }}>{selectedJob.job_description || 'No description available.'}</p>
+                                    </div>
+                                    {selectedJob.job_highlights && Object.keys(selectedJob.job_highlights).length > 0 && (
+                                        <div className="job-highlights">
+                                            {Object.entries(selectedJob.job_highlights).filter(([_, items]) => Array.isArray(items) && items.length > 0).map(([key, items]) => (
+                                                <div key={key}>
+                                                    <h4>{key.replace(/_/g, ' ')}</h4>
+                                                    <ul>{items.map((item, i) => <li key={i}>{item}</li>)}</ul>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <div className="apply-options">
+                                        <h4>Apply On:</h4>
+                                        <div className="platform-links">
+                                            {getPlatformLinks(selectedJob).length > 0 ? (
+                                                getPlatformLinks(selectedJob).map((option, index) => (
+                                                    <div key={index} className="apply-link-container">
+                                                        <a
+                                                            href={option.apply_link}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="platform-link"
+                                                        >
+                                                            {option.publisher || 'Direct Link'}
+                                                        </a>
+                                                        <button
+                                                            className={`mark-applied-button ${isJobApplied(selectedJob.job_id) ? 'applied' : ''}`}
+                                                            onClick={() => handleMarkAsApplied(selectedJob.job_id)}
+                                                            disabled={isJobApplied(selectedJob.job_id)}
+                                                        >
+                                                            {isJobApplied(selectedJob.job_id) ? 'Applied' : 'Mark as Applied'}
+                                                        </button>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                selectedJob.employer_website ? (
+                                                    <div className="apply-link-container">
+                                                        <a
+                                                            href={selectedJob.employer_website}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="platform-link employer-link"
+                                                        >
+                                                            {selectedJob.employer_name} Website
+                                                        </a>
+                                                        <button
+                                                            className={`mark-applied-button ${isJobApplied(selectedJob.job_id) ? 'applied' : ''}`}
+                                                            onClick={() => handleMarkAsApplied(selectedJob.job_id)}
+                                                            disabled={isJobApplied(selectedJob.job_id)}
+                                                        >
+                                                            {isJobApplied(selectedJob.job_id) ? 'Applied' : 'Mark as Applied'}
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <p>No direct application links found.</p>
+                                                )
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="job-cards">
+                                {filteredJobs.length > 0 ? filteredJobs.map(job => (
+                                    <div key={job.job_id} className="job-card" onClick={() => setSelectedJob(job)}>
+                                        <div className="job-card-header">
+                                            <h3>{job.job_title}</h3>
+                                            <h4>{job.employer_name}</h4>
+                                            <p className="location">{job.job_city}{job.job_state ? `, ${job.job_state}` : ''} {job.job_country}{job.job_is_remote && <span className="remote-tag-list"> (Remote Available)</span>}</p>
+                                        </div>
+                                        <div className="job-card-body">
+                                            <p className="posted-date">Posted: {formatDate(job.job_posted_at_timestamp)}{job.job_offer_expiration_timestamp && ` | Expires: ${formatDate(job.job_offer_expiration_timestamp)}`}</p>
+                                            {job.job_employment_type && <p className="employment-type">{job.job_employment_type}</p>}
+                                            <div className="platform-tags">
+                                                {getPlatformLinks(job).slice(0, 3).map((option, index) => (
+                                                    <span key={index} className="platform-tag">{option.publisher}</span>
+                                                ))}
+                                                {getPlatformLinks(job).length > 3 && (
+                                                    <span className="platform-tag">+{getPlatformLinks(job).length - 3} more</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )) : (
+                                    <div className="no-results">
+                                        {searchExecuted || filters.title || filters.location ? 'No jobs found matching your criteria for this page.' : jobs.length === 0 && !loading ? 'No jobs found for the initial query.' : 'Enter search criteria or browse pages.'}
+                                    </div>
+                                )}
+                            </div>
+                            {(jobs.length > 0 || loading || currentPage > 1) && !selectedJob && (
+                                <div className="pagination-controls">
+                                    <button onClick={handlePrevPage} disabled={currentPage === 1 || loading}>&larr; Previous</button>
+                                    <span>Page {currentPage}</span>
+                                    <button onClick={handleNextPage} disabled={loading || jobs.length === 0}>Next &rarr;</button>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </>
+            )}
+        </div>
+    );
 };
 
 export default JobListings;
