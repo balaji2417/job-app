@@ -158,6 +158,21 @@ app.get("/api/me", requireAuth, async (req, res) => {
     }
 });
 
+app.post("/api/getRecords",async (req,res) => {
+    const {email} = req.body;
+    try
+    {
+        const records = await prisma.Application.findMany({
+            where:{userId:email}
+        });
+        res.json({records});
+        
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error fetching user data" });
+    }
+});
 // POST endpoint: Logout a user (Clear token)
 app.post('/api/logout', (req, res) => {
     // Clear the token by setting it to an expired value

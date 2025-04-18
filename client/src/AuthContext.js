@@ -7,6 +7,7 @@ export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error_call, setErrorCall] = useState('');
   const [user, setUser] = useState(null);
+  const [records,setRecords] = useState(null);
 
   // Use effect to show an alert when error_call changes
  
@@ -39,6 +40,29 @@ export function AuthProvider({ children }) {
 
     fetchUserData();
   }, []);
+
+  const fetchRecords = async (email) => {
+    try {
+        const res = await fetch('http://localhost:5000/api/getRecords', {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+        });
+
+        console.log("Fetch response:", res);
+
+        if (res.ok) {
+            const userData = await res.json();
+            console.log("Received data:", userData);
+            setRecords(userData.records);
+        } else {
+            console.log("Server error, status:", res.status);
+        }
+    } catch (error) {
+        console.error("Fetch failed:", error);
+    }
+};
 
   const login = async (email, password) => {
     const res = await fetch('http://localhost:5000/api/login', {
@@ -97,7 +121,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, loading, user, login, register, logout,error_call }}
+      value={{ isAuthenticated, loading, user, login, register, logout,error_call,fetchRecords,records }}
     >
       {children}
     </AuthContext.Provider>

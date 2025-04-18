@@ -9,37 +9,55 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 
 const profile = () => {
+  const { user, fetchRecords, records } = useAuthUser();
+
+useEffect(() => {
+    if (user && user.email) {
+        fetchRecords(user.email);
+    }
+}, [user]); 
+  
+
  return (
-    <table className="table table-striped">
-      <thead className="table-dark">
+  <table className="table table-striped">
+  <thead className="table-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Job Name</th>
+      <th scope="col">Status</th>
+      <th scope="col">Date Applied</th>
+      <th scope="col">Change Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {records && records.length > 0 ? (
+      records.map((record, index) => (
+        <tr key={index}>
+          <th scope="row">{index + 1}</th>
+          <td>{record.jobName}</td>
+          <td>{record.status}</td>
+          <td>{record.dateApplied}</td>
+          <td>
+            <select
+              className="form-select"
+              value={record.status} 
+              onChange={(e) => handleStatusChange(e, index)}
+            >
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </td>
+        </tr>
+      ))
+    ) : (
       <tr>
-        <th scope="col"></th>
-        <th scope="col">First</th>
-        <th scope="col">Last</th>
-        <th scope="col">Handle</th>
+        <td colSpan="4">No records found.</td>
       </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <th scope="row">1</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
-      </tr>
-      <tr>
-        <th scope="row">2</th>
-        <td>Jacob</td>
-        <td>Thornton</td>
-        <td>@fat</td>
-      </tr>
-      <tr>
-        <th scope="row">3</th>
-        <td>Larry</td>
-        <td>the Bird</td>
-        <td>@twitter</td>
-      </tr>
-    </tbody>
-  </table>
+    )}
+  </tbody>
+</table>
+
  );
 };
 
