@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './JobListings.css';
 
 const JobListings = () => {
-    const RAPIDAPI_KEY = '739f4954b0mshbd8df681ece270ep1c2256jsn577086b56c18'; 
+    const RAPIDAPI_KEY = '9fce43bfb1mshe32bdec8de47861p18c340jsnbebcf1630f65'; 
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -277,7 +277,7 @@ const JobListings = () => {
                                     </div>
                                 )) : (
                                     <div className="no-results">
-                                        {searchExecuted || filters.title || filters.location ? 'No jobs found matching your criteria for this page.' : jobs.length === 0 && !loading ? 'No jobs found for the initial query.' : 'Enter search criteria or browse pages.'}
+                                        {searchExecuted || filters.title || filters.location ? 'No jobs found matching your criteria for this page.' : jobs.length === 0 && !loading ? 'No jobs found for the initial query.' : 'Please Browse the next page.'}
                                     </div>
                                 )}
                             </div>
