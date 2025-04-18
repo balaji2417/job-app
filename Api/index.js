@@ -173,9 +173,30 @@ app.post("/api/getRecords",async (req,res) => {
         res.status(500).json({ error: "Error fetching user data" });
     }
 });
-// POST endpoint: Logout a user (Clear token)
+app.post("/api/updateRecord", async (req, res) => {
+    const { email, value, id } = req.body;  
+
+    try {
+        const updatedRecord = await prisma.Application.update({
+            where: {
+                userId_jobListingId: {
+                  userId: email,
+                  jobListingId: id
+                }
+              },  
+            data: { status: value } 
+        });
+
+       
+    } 
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error updating user record" });
+    }
+});
+
 app.post('/api/logout', (req, res) => {
-    // Clear the token by setting it to an expired value
+   
     res.clearCookie('token');
     return res.status(200).json({ message: "Logged out successfully" });
 });

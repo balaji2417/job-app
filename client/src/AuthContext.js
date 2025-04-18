@@ -41,6 +41,7 @@ export function AuthProvider({ children }) {
     fetchUserData();
   }, []);
 
+  
   const fetchRecords = async (email) => {
     try {
         const res = await fetch('http://localhost:5000/api/getRecords', {
@@ -64,6 +65,15 @@ export function AuthProvider({ children }) {
     }
 };
 
+const updateRecord = async  (email,value,id) => {
+  const res = await fetch('http://localhost:5000/api/updateRecord', {
+    method: "POST",
+    credentials: "include",
+    headers: {"Content-Type": "application/json" },
+    body:JSON.stringify({email,value,id}),
+
+  });
+}
   const login = async (email, password) => {
     const res = await fetch('http://localhost:5000/api/login', {
       method: "POST",
@@ -121,7 +131,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, loading, user, login, register, logout,error_call,fetchRecords,records }}
+      value={{ isAuthenticated, loading, user, login, register, logout,error_call,fetchRecords,records,updateRecord}}
     >
       {children}
     </AuthContext.Provider>

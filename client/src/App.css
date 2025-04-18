@@ -148,7 +148,17 @@ img {
 .App-link {
   color: #61dafb;
 }
-
+.mark-update {
+  padding: 10px 16px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s;
+}
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

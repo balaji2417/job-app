@@ -7,58 +7,79 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 
 
+const Profile = () => {
+  const { user, fetchRecords, records, updateRecord } = useAuthUser();
+  const [statusMap, setStatusMap] = useState({});
 
-const profile = () => {
-  const { user, fetchRecords, records } = useAuthUser();
-
-useEffect(() => {
+  useEffect(() => {
     if (user && user.email) {
-        fetchRecords(user.email);
+      fetchRecords(user.email);
     }
-}, [user]); 
-  
+  }, [user, fetchRecords]); 
 
- return (
-  <table className="table table-striped">
-  <thead className="table-dark">
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Job Name</th>
-      <th scope="col">Status</th>
-      <th scope="col">Date Applied</th>
-      <th scope="col">Change Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    {records && records.length > 0 ? (
-      records.map((record, index) => (
-        <tr key={index}>
-          <th scope="row">{index + 1}</th>
-          <td>{record.jobName}</td>
-          <td>{record.status}</td>
-          <td>{record.dateApplied}</td>
-          <td>
-            <select
-              className="form-select"
-              value={record.status} 
-              onChange={(e) => handleStatusChange(e, index)}
-            >
-              <option value="Pending">Pending</option>
-              <option value="Approved">Approved</option>
-              <option value="Rejected">Rejected</option>
-            </select>
-          </td>
+  const handleStatusChange = (id, newStatus) => {
+    setStatusMap(prev => ({ ...prev, [id]: newStatus }));
+  };
+
+  const handleUpdateClick = async (id) => {
+    try {
+      const newStatus = statusMap[id] || 'Interview Scheduled';
+      await updateRecord(user.email, newStatus, id);
+      await fetchRecords(user.email);  // ensure fresh data
+    } catch (error) {
+      console.error('Error updating status or fetching records:', error);
+    }
+  };
+
+  return (
+    <table className="table table-striped">
+      <thead className="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Job Name</th>
+          <th>Status</th>
+          <th>Date Applied</th>
+          <th>Change Status</th>
+          <th>Update</th>
         </tr>
-      ))
-    ) : (
-      <tr>
-        <td colSpan="4">No records found.</td>
-      </tr>
-    )}
-  </tbody>
-</table>
-
- );
+      </thead>
+      <tbody>
+        {records && records.length > 0 ? (
+          records.map((record, index) => (
+            <tr key={index}>
+              <th>{index + 1}</th>
+              <td>{record.jobName}</td>
+              <td>{record.status}</td>
+              <td>{record.dateApplied}</td>
+              <td>
+                <select
+                  className="form-select"
+                  value={statusMap[record.jobListingId] || record.status}
+                  onChange={(e) => handleStatusChange(record.jobListingId, e.target.value)}
+                >
+                  <option value="Interview Scheduled">Interview Scheduled</option>
+                  <option value="Selected">Selected</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </td>
+              <td>
+                <button 
+                  className="mark-update"
+                  onClick={() => handleUpdateClick(record.jobListingId)}
+                >
+                  Update
+                </button>
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="6">No records found.</td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  );
 };
 
-export default profile;
+export default Profile;
