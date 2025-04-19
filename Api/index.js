@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: 'http://localhost:5000', // React app's URL
+    origin: 'http://localhost:3000', // React app's URL
     methods: ['POST', 'GET'],
     credentials: true,  // Allow cookies to be sent with the request
 }));
@@ -210,7 +210,6 @@ app.get('/api/protected', requireAuth, (req, res) => {
 // POST endpoint: Create a new application (with userId passed in the request)
 app.post('/api/application', requireAuth, async (req, res) => {
     const {
-        email,
         jobListingId,
         status,
         dateApplied,
@@ -225,7 +224,7 @@ app.post('/api/application', requireAuth, async (req, res) => {
     try {
         const newApplication = await prisma.application.create({
             data: {
-                userId: email,  // From JWT
+                userId: req.user.email,  // From JWT
                 jobListingId: jobListingId,
                 status: status,
                 dateApplied: new Date(dateApplied),
@@ -243,4 +242,10 @@ app.post('/api/application', requireAuth, async (req, res) => {
         console.error("Error inserting application:", error);
         return res.status(500).json({ error: "Failed to insert application." });
     }
+});
+
+// Start the Express server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
