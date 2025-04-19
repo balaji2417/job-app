@@ -41,7 +41,13 @@ export function AuthProvider({ children }) {
     fetchUserData();
   }, []);
 
+  const insertApplication = async (email,jobId,status,currentDateTime,dateUpdated,notes,jobTitle,employer_name,apply_link,publisher) => {
+    
+
+    
   
+    alert("Data Inserted...");
+  };
   const fetchRecords = async (email) => {
     try {
         const res = await fetch('http://localhost:5000/api/getRecords', {
@@ -127,7 +133,7 @@ const updateRecord = async  (email,value,id) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, loading, user, login, register, logout,error_call,fetchRecords,records,updateRecord}}
+      value={{ isAuthenticated, loading, user, login, register, logout,error_call,fetchRecords,insertApplication,records,updateRecord}}
     >
       {children}
     </AuthContext.Provider>

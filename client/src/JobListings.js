@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './JobListings.css';
+import { useAuthUser } from "./AuthContext";
 
 const JobListings = () => {
     const RAPIDAPI_KEY = '9fce43bfb1mshe32bdec8de47861p18c340jsnbebcf1630f65'; 
     const [jobs, setJobs] = useState([]);
+    const {user,insertApplication} = userAuthUser();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedJob, setSelectedJob] = useState(null);
@@ -141,9 +143,12 @@ const JobListings = () => {
         const date = new Date(timestamp * 1000);
         return date.toLocaleDateString();
     };
-
-    const handleMarkAsApplied = (jobId) => {
+   
+    const handleMarkAsApplied = (jobId,jobTitle,publisher,employer_name,apply_link) => {
+        const currentDateTime = new Date().toLocaleString();
+        insertApplication(user.email,jobId,'Applied',currentDateTime,currentDateTime,'Nothing',jobTitle,employer_name,apply_link,publisher)
         setAppliedJobs(prev => new Set(prev).add(jobId));
+
     };
 
     const isJobApplied = (jobId) => {
@@ -204,6 +209,7 @@ const JobListings = () => {
                                     <div className="apply-options">
                                         <h4>Apply On:</h4>
                                         <div className="platform-links">
+                                            {/* Render platform links only */}
                                             {getPlatformLinks(selectedJob).length > 0 ? (
                                                 getPlatformLinks(selectedJob).map((option, index) => (
                                                     <div key={index} className="apply-link-container">
@@ -215,9 +221,10 @@ const JobListings = () => {
                                                         >
                                                             {option.publisher || 'Direct Link'}
                                                         </a>
+                                                        {/* Keep the Mark as Applied button for platform links */}
                                                         <button
                                                             className={`mark-applied-button ${isJobApplied(selectedJob.job_id) ? 'applied' : ''}`}
-                                                            onClick={() => handleMarkAsApplied(selectedJob.job_id)}
+                                                            onClick={() => handleMarkAsApplied(selectedJob.job_id,selectedJob.job_title,option.publisher,selectedJob.employer_name,option.apply_link)}
                                                             disabled={isJobApplied(selectedJob.job_id)}
                                                         >
                                                             {isJobApplied(selectedJob.job_id) ? 'Applied' : 'Mark as Applied'}
@@ -225,27 +232,8 @@ const JobListings = () => {
                                                     </div>
                                                 ))
                                             ) : (
-                                                selectedJob.employer_website ? (
-                                                    <div className="apply-link-container">
-                                                        <a
-                                                            href={selectedJob.employer_website}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="platform-link employer-link"
-                                                        >
-                                                            {selectedJob.employer_name} Website
-                                                        </a>
-                                                        <button
-                                                            className={`mark-applied-button ${isJobApplied(selectedJob.job_id) ? 'applied' : ''}`}
-                                                            onClick={() => handleMarkAsApplied(selectedJob.job_id)}
-                                                            disabled={isJobApplied(selectedJob.job_id)}
-                                                        >
-                                                            {isJobApplied(selectedJob.job_id) ? 'Applied' : 'Mark as Applied'}
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <p>No direct application links found.</p>
-                                                )
+                                                // This message is shown if getPlatformLinks returns empty
+                                                <p>No direct application links found for the selected platform.</p>
                                             )}
                                         </div>
                                     </div>
@@ -277,7 +265,7 @@ const JobListings = () => {
                                     </div>
                                 )) : (
                                     <div className="no-results">
-                                        {searchExecuted || filters.title || filters.location ? 'No jobs found matching your criteria for this page.' : jobs.length === 0 && !loading ? 'No jobs found for the initial query.' : 'Please Browse the next page.'}
+                                        {searchExecuted || filters.title || filters.location ? 'No jobs found matching your criteria for this page.' : jobs.length === 0 && !loading ? 'No jobs found for the initial query.' : 'Please browse the next page'}
                                     </div>
                                 )}
                             </div>
