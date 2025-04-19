@@ -209,27 +209,37 @@ app.get('/api/protected', requireAuth, (req, res) => {
 
 // POST endpoint: Create a new application (with userId passed in the request)
 app.post('/api/application', requireAuth, async (req, res) => {
-    const { jobListingId, status, dateApplied, dateUpdated, notes } = req.body;
+    const {
+        jobListingId,
+        status,
+        dateApplied,
+        dateUpdated,
+        notes,
+        jobTitle,
+        employer_name,
+        apply_link,
+        publisher
+    } = req.body;
 
-    // Create a new application linked to the userId from the JWT (email)
-    const newApplication = await prisma.application.create({
-        data: {
-            userId: req.user.email,  // Use the email from the JWT
-            jobListingId: jobListingId,
-            status: status,
-            dateApplied: new Date(dateApplied), // Ensure the date is in correct format
-            dateUpdated: dateUpdated ? new Date(dateUpdated) : null, // Optional field, convert to date if provided
-            notes: notes || null, // Optional field
-            jobName: jobName,
-        }
-    });
+    try {
+        const newApplication = await prisma.application.create({
+            data: {
+                userId: req.user.email,  // From JWT
+                jobListingId: jobListingId,
+                status: status,
+                dateApplied: new Date(dateApplied),
+                dateUpdated: dateUpdated ? new Date(dateUpdated) : null,
+                notes: notes || null,
+                jobName: jobTitle,             // From frontend
+                companyName: employer_name,    // New field
+                jobLink: apply_link,           // New field
+                platformNameFK: publisher      // Foreign key to platform table
+            }
+        });
 
-    // Return the newly created application as response
-    return res.status(201).json(newApplication);
-});
-
-// Start the Express server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+        return res.status(201).json(newApplication);
+    } catch (error) {
+        console.error("Error inserting application:", error);
+        return res.status(500).json({ error: "Failed to insert application." });
+    }
 });
