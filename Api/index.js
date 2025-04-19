@@ -208,42 +208,43 @@ app.get('/api/protected', requireAuth, (req, res) => {
 });
 
 // POST endpoint: Create a new application (with userId passed in the request)
-app.post('/api/application', requireAuth, async (req, res) => {
+app.post('/api/application', async (req, res) => {
     const {
-        jobListingId,
-        status,
-        dateApplied,
-        dateUpdated,
-        notes,
-        jobTitle,
-        employer_name,
-        apply_link,
-        publisher
+      email,
+      jobId,
+      status,
+      dateApplied,
+      dateUpdated,
+      notes,
+      jobTitle,
+      employer_name,
+      apply_link,
+      publisher
     } = req.body;
-
+  
     try {
-        const newApplication = await prisma.application.create({
-            data: {
-                userId: req.user.email,  // From JWT
-                jobListingId: jobListingId,
-                status: status,
-                dateApplied: new Date(dateApplied),
-                dateUpdated: dateUpdated ? new Date(dateUpdated) : null,
-                notes: notes || null,
-                jobName: jobTitle,             // From frontend
-                companyName: employer_name,    // New field
-                jobLink: apply_link,           // New field
-                platformNameFK: publisher      // Foreign key to platform table
-            }
-        });
-
-        return res.status(201).json(newApplication);
+      const newApplication = await prisma.application.create({
+        data: { 
+          userId: email, // ✅ directly from frontend
+          jobListingId: jobId,
+          status,
+          dateApplied: new Date(dateApplied),
+          dateUpdated: dateUpdated ? new Date(dateUpdated) : null,
+          notes: notes || null,
+          jobName: jobTitle,
+          companyName: employer_name,
+          jobLink: apply_link,
+          platformName: publisher // FK to platformName table
+        }
+      });
+  
+      return res.status(201).json(newApplication);
     } catch (error) {
-        console.error("Error inserting application:", error);
-        return res.status(500).json({ error: "Failed to insert application." });
+      console.error("Error inserting application:", error);
+      return res.status(500).json({ error: "Failed to insert application." });
     }
-});
-
+  });
+  
 // Start the Express server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

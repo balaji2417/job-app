@@ -41,23 +41,43 @@ export function AuthProvider({ children }) {
     fetchUserData();
   }, []);
 
-  const insertApplication = async (email,jobId,status,currentDateTime,dateUpdated,notes,jobTitle,employer_name,apply_link,publisher) => {
+  const insertApplication = async (
+    email, jobId, status, currentDateTime,
+    dateUpdated, notes, jobTitle,
+    employer_name, apply_link, publisher
+  ) => {
     try {
       const res = await fetch('http://localhost:5000/api/application', {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email,jobId,status,currentDateTime,dateUpdated,notes,jobTitle,employer_name,apply_link,publisher }),
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email,
+          jobId,
+          status,
+          dateApplied: currentDateTime,
+          dateUpdated,
+          notes,
+          jobTitle,
+          employer_name,
+          apply_link,
+          publisher
+        }),
       });
-
-    
   
-    alert("Data Inserted...");
-  }
-catch (error) {
-  console.error("Fetch failed:", error);
-}
+      if (res.ok) {
+        alert("Data Inserted!");
+      } else {
+        console.error("Insert failed with status:", res.status);
+      }
+    } catch (error) {
+      console.error("Fetch failed:", error);
+    }
   };
+
+
   const fetchRecords = async (email) => {
     try {
         const res = await fetch('http://localhost:5000/api/getRecords', {
