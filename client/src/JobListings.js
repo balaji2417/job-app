@@ -4,6 +4,7 @@ import { useAuthUser } from "./AuthContext";
 
 const JobListings = () => {
     const RAPIDAPI_KEY = '9fce43bfb1mshe32bdec8de47861p18c340jsnbebcf1630f65'; 
+    
     const [jobs, setJobs] = useState([]);
     const {user,insertApplication} = useAuthUser();
     const [loading, setLoading] = useState(false);
