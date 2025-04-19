@@ -210,7 +210,8 @@ app.get('/api/protected', requireAuth, (req, res) => {
 // POST endpoint: Create a new application (with userId passed in the request)
 app.post('/api/application', requireAuth, async (req, res) => {
     const {
-        jobListingId,
+        email,
+        jobId,
         status,
         dateApplied,
         dateUpdated,
@@ -224,8 +225,8 @@ app.post('/api/application', requireAuth, async (req, res) => {
     try {
         const newApplication = await prisma.application.create({
             data: {
-                userId: req.user.email,  // From JWT
-                jobListingId: jobListingId,
+                userId: email,  // From JWT
+                jobListingId: jobId,
                 status: status,
                 dateApplied: new Date(dateApplied),
                 dateUpdated: dateUpdated ? new Date(dateUpdated) : null,
