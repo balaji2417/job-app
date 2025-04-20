@@ -11,6 +11,7 @@ import { AuthProvider } from './AuthContext'; // Import Auth Context
 import Login from './Login';
 import TopNav from './TopNav';
 import Profile from './profile';
+import Dashboard from './dashboard'
 import Home from './Home';
 import RequireAuth from './RequireAuth'
 import JobListings from './JobListings';
@@ -33,8 +34,9 @@ root.render(
     
     
     } >
-    <Route index element = { <JobListings />}/>
+    <Route index element = { <Dashboard />}/>
     <Route path="profile"  element = { <Profile />}/>
+    <Route path="jobsearch"  element = { <JobListings />}/>
 </Route>
 </Routes>
 </BrowserRouter>

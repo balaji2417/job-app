@@ -41,8 +41,7 @@ const TopNav = () => {
               Good Day {user.firstName}
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item onClick={gotoHomeJob}>Home</Dropdown.Item>
-              <Dropdown.Item onClick={gotoProfile}>Profile</Dropdown.Item>
+              <Dropdown.Item onClick={gotoHomeJob}>Dashboard</Dropdown.Item>
               <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>

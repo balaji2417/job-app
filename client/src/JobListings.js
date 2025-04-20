@@ -10,6 +10,7 @@ const JobListings = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedJob, setSelectedJob] = useState(null);
+    const [jobsApplied,setJobsApplied] = useState(null);
     const [filters, setFilters] = useState({
         title: '',
         location: '',
