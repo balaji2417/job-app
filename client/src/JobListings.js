@@ -158,11 +158,11 @@ const JobListings = () => {
     };
 
     return (
-        <div className="job-listings-container">
-            <div className="filters">
+        <div className="jl-job-listings-container">
+            <div className="jl-filters">
                 <h2>Find Your Dream Job</h2>
                 <form onSubmit={handleSearch}>
-                    <div className="filter-group">
+                    <div className="jl-filter-group">
                         <input type="text" name="title" placeholder="Job title (optional)" value={filters.title} onChange={handleFilterChange} disabled={loading} />
                         <input type="text" name="location" placeholder="Location (optional)" value={filters.location} onChange={handleFilterChange} disabled={loading} />
                         <select name="platform" value={filters.platform} onChange={handleFilterChange} disabled={loading}>
@@ -170,36 +170,36 @@ const JobListings = () => {
                                 <option key={platform.value} value={platform.value}>{platform.label}</option>
                             ))}
                         </select>
-                        <button type="submit" className="search-button" disabled={loading}>{loading && currentPage === 1 && searchExecuted ? 'Searching...' : 'Search Jobs'}</button>
-                        <button type="button" className="reset-button" onClick={handleReset} disabled={loading}>Reset</button>
+                        <button type="submit" className="jl-search-button" disabled={loading}>{loading && currentPage === 1 && searchExecuted ? 'Searching...' : 'Search Jobs'}</button>
+                        <button type="button" className="jl-reset-button" onClick={handleReset} disabled={loading}>Reset</button>
                     </div>
                 </form>
             </div>
 
-            {loading && <div className="loading">Loading Page {currentPage}...</div>}
-            {error && <div className="error">Error: {error}</div>}
+            {loading && <div className="jl-loading">Loading Page {currentPage}...</div>}
+            {error && <div className="jl-error">Error: {error}</div>}
 
             {!loading && !error && (
                 <>
                     {selectedJob ? (
-                        <div className="job-detail">
-                            <button className="back-button" onClick={() => setSelectedJob(null)}>&larr; Back to listings (Page {currentPage})</button>
-                            <div className="job-detail-card">
-                                <div className="job-header">
+                        <div className="jl-job-detail">
+                            <button className="jl-back-button" onClick={() => setSelectedJob(null)}>&larr; Back to listings (Page {currentPage})</button>
+                            <div className="jl-job-detail-card">
+                                <div className="jl-job-header">
                                     <h2>{selectedJob.job_title}</h2>
                                     <h3>{selectedJob.employer_name}</h3>
-                                    <p className="location">{selectedJob.job_city}{selectedJob.job_state ? `, ${selectedJob.job_state}` : ''} {selectedJob.job_country}</p>
-                                    {selectedJob.job_is_remote && <p className="remote-tag">Remote</p>}
-                                    <p className="posted-date">Posted: {formatDate(selectedJob.job_posted_at_timestamp)}{selectedJob.job_offer_expiration_timestamp && ` | Expires: ${formatDate(selectedJob.job_offer_expiration_timestamp)}`}</p>
-                                    {selectedJob.job_employment_type && <p className="employment-type">{selectedJob.job_employment_type}</p>}
+                                    <p className="jl-location">{selectedJob.job_city}{selectedJob.job_state ? `, ${selectedJob.job_state}` : ''} {selectedJob.job_country}</p>
+                                    {selectedJob.job_is_remote && <p className="jl-remote-tag">Remote</p>}
+                                    <p className="jl-posted-date">Posted: {formatDate(selectedJob.job_posted_at_timestamp)}{selectedJob.job_offer_expiration_timestamp && ` | Expires: ${formatDate(selectedJob.job_offer_expiration_timestamp)}`}</p>
+                                    {selectedJob.job_employment_type && <p className="jl-employment-type">{selectedJob.job_employment_type}</p>}
                                 </div>
-                                <div className="job-content">
-                                    <div className="job-description">
+                                <div className="jl-job-content">
+                                    <div className="jl-job-description">
                                         <h4>Job Description</h4>
                                         <p style={{ whiteSpace: 'pre-wrap' }}>{selectedJob.job_description || 'No description available.'}</p>
                                     </div>
                                     {selectedJob.job_highlights && Object.keys(selectedJob.job_highlights).length > 0 && (
-                                        <div className="job-highlights">
+                                        <div className="jl-job-highlights">
                                             {Object.entries(selectedJob.job_highlights).filter(([_, items]) => Array.isArray(items) && items.length > 0).map(([key, items]) => (
                                                 <div key={key}>
                                                     <h4>{key.replace(/_/g, ' ')}</h4>
@@ -208,24 +208,24 @@ const JobListings = () => {
                                             ))}
                                         </div>
                                     )}
-                                    <div className="apply-options">
+                                    <div className="jl-apply-options">
                                         <h4>Apply On:</h4>
-                                        <div className="platform-links">
+                                        <div className="jl-platform-links">
                                             {/* Render platform links only */}
                                             {getPlatformLinks(selectedJob).length > 0 ? (
                                                 getPlatformLinks(selectedJob).map((option, index) => (
-                                                    <div key={index} className="apply-link-container">
+                                                    <div key={index} className="jl-apply-link-container">
                                                         <a
                                                             href={option.apply_link}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="platform-link"
+                                                            className="jl-platform-link"
                                                         >
                                                             {option.publisher || 'Direct Link'}
                                                         </a>
                                                         {/* Keep the Mark as Applied button for platform links */}
                                                         <button
-                                                            className={`mark-applied-button ${isJobApplied(selectedJob.job_id) ? 'applied' : ''}`}
+                                                            className={`jl-mark-applied-button ${isJobApplied(selectedJob.job_id) ? 'applied' : ''}`}
                                                             onClick={() => handleMarkAsApplied(selectedJob.job_id,selectedJob.job_title,option.publisher,selectedJob.employer_name,option.apply_link)}
                                                             disabled={isJobApplied(selectedJob.job_id)}
                                                         >
@@ -244,35 +244,35 @@ const JobListings = () => {
                         </div>
                     ) : (
                         <>
-                            <div className="job-cards">
+                            <div className="jl-job-cards">
                                 {filteredJobs.length > 0 ? filteredJobs.map(job => (
-                                    <div key={job.job_id} className="job-card" onClick={() => setSelectedJob(job)}>
-                                        <div className="job-card-header">
+                                    <div key={job.job_id} className="jl-job-card" onClick={() => setSelectedJob(job)}>
+                                        <div className="jl-job-card-header">
                                             <h3>{job.job_title}</h3>
                                             <h4>{job.employer_name}</h4>
-                                            <p className="location">{job.job_city}{job.job_state ? `, ${job.job_state}` : ''} {job.job_country}{job.job_is_remote && <span className="remote-tag-list"> (Remote Available)</span>}</p>
+                                            <p className="jl-location">{job.job_city}{job.job_state ? `, ${job.job_state}` : ''} {job.job_country}{job.job_is_remote && <span className="jl-remote-tag-list"> (Remote Available)</span>}</p>
                                         </div>
-                                        <div className="job-card-body">
-                                            <p className="posted-date">Posted: {formatDate(job.job_posted_at_timestamp)}{job.job_offer_expiration_timestamp && ` | Expires: ${formatDate(job.job_offer_expiration_timestamp)}`}</p>
-                                            {job.job_employment_type && <p className="employment-type">{job.job_employment_type}</p>}
-                                            <div className="platform-tags">
+                                        <div className="jl-job-card-body">
+                                            <p className="jl-posted-date">Posted: {formatDate(job.job_posted_at_timestamp)}{job.job_offer_expiration_timestamp && ` | Expires: ${formatDate(job.job_offer_expiration_timestamp)}`}</p>
+                                            {job.job_employment_type && <p className="jl-employment-type">{job.job_employment_type}</p>}
+                                            <div className="jl-platform-tags">
                                                 {getPlatformLinks(job).slice(0, 3).map((option, index) => (
-                                                    <span key={index} className="platform-tag">{option.publisher}</span>
+                                                    <span key={index} className="jl-platform-tag">{option.publisher}</span>
                                                 ))}
                                                 {getPlatformLinks(job).length > 3 && (
-                                                    <span className="platform-tag">+{getPlatformLinks(job).length - 3} more</span>
+                                                    <span className="jl-platform-tag">+{getPlatformLinks(job).length - 3} more</span>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
                                 )) : (
-                                    <div className="no-results">
+                                    <div className="jl-no-results">
                                         {searchExecuted || filters.title || filters.location ? 'No jobs found matching your criteria for this page.' : jobs.length === 0 && !loading ? 'No jobs found for the initial query.' : 'Please browse the next page'}
                                     </div>
                                 )}
                             </div>
                             {(jobs.length > 0 || loading || currentPage > 1) && !selectedJob && (
-                                <div className="pagination-controls">
+                                <div className="jl-pagination-controls">
                                     <button onClick={handlePrevPage} disabled={currentPage === 1 || loading}>&larr; Previous</button>
                                     <span>Page {currentPage}</span>
                                     <button onClick={handleNextPage} disabled={loading || jobs.length === 0}>Next &rarr;</button>

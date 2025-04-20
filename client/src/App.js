@@ -7,6 +7,7 @@ import jobImage from './images/login_image.jpeg';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+
 function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

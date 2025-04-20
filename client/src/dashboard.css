@@ -1,0 +1,413 @@
+/* src/Dashboard.css */
+
+/* Basic Reset and Body Styling */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background-color: #f8f9fa; /* Matches container background */
+  }
+  
+  .dashboard-container {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    position: relative;
+    overflow: hidden; /* <-- Add this line back */
+  }
+  
+  /* --- Decorative Blobs (Adjusted colors and positions) --- */
+  /* ... (rest of your blob styles remain the same) ... */
+  .dashboard-blob {
+    position: absolute;
+    z-index: 0; /* Ensure blobs are behind content */
+  }
+  
+  .blob-top-right {
+    top: -100px;
+    right: -50px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background-color: rgba(100, 149, 237, 0.08); /* CornflowerBlue */
+  }
+  
+  .blob-bottom-left {
+    bottom: -150px; /* Blob positioned partially below the container */
+    left: -100px;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background-color: rgba(46, 139, 87, 0.06); /* SeaGreen */
+  }
+  
+  .blob-middle-left {
+    top: 40%;
+    left: -80px;
+    width: 200px;
+    height: 200px;
+    border-radius: 60% 40% 70% 30% / 60% 30% 70% 40%;
+    background-color: rgba(219, 112, 147, 0.04); /* PaleVioletRed */
+  }
+  
+  .blob-small-top {
+    top: 15%;
+    right: 20%;
+    width: 150px;
+    height: 150px;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    background-color: rgba(255, 215, 0, 0.05); /* Gold */
+  }
+  
+  
+  /* --- Main Content Layout --- */
+  /* ... (rest of your layout and component styles remain the same) ... */
+  
+  .dashboard-main-content {
+    display: flex;
+    flex-direction: row;
+    padding: 30px 20px;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .dashboard-profile-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .profile-pic-container {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    border: 5px solid white;
+    margin: 20px 0;
+    flex-shrink: 0;
+  }
+  
+  .profile-pic {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .profile-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #6495ED;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    font-weight: bold;
+  }
+  
+  .welcome-text {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-top: 20px;
+    margin-bottom: 5px;
+  }
+  
+  .welcome-subtext {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    line-height: 1.5;
+  }
+  
+  /* --- Feature Cards Layout (Using Grid) --- */
+  .dashboard-feature-section {
+    flex: 2;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    justify-items: center;
+    align-content: center;
+  }
+  
+  .dashboard-feature-card {
+    border-radius: 16px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    position: relative;
+    overflow: hidden; /* Keep overflow hidden on card too if needed for internal elements */
+    backdrop-filter: blur(5px);
+    width: 100%;
+    text-align: left;
+  }
+  
+  /* Alternating layout for icon and content */
+  .dashboard-feature-card:nth-child(odd) {
+    flex-direction: row;
+  }
+  
+  .dashboard-feature-card:nth-child(even) {
+    flex-direction: row-reverse;
+  }
+  
+  .dashboard-feature-icon {
+    font-size: 2.5rem;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 20px;
+  }
+  
+  .dashboard-feature-card:nth-child(even) .dashboard-feature-icon {
+    margin-right: 0;
+    margin-left: 20px;
+  }
+  
+  .dashboard-feature-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .feature-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  
+  .feature-description {
+    font-size: 0.95rem;
+    color: #4a5568;
+    line-height: 1.5;
+    margin: 0;
+  }
+  
+  /* --- Hover Effects (Using CSS :hover) --- */
+  .dashboard-feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+  
+  /* Specific hover background colors */
+  .dashboard-feature-card:nth-child(1):hover { background-color: rgba(10, 11, 11, 0.7); }
+  .dashboard-feature-card:nth-child(2):hover { background-color: rgba(255, 182, 193, 0.7); }
+  .dashboard-feature-card:nth-child(3):hover { background-color: rgba(152, 251, 152, 0.7); }
+  
+  
+  /* --- Responsive Design (Media Queries) --- */
+  
+  /* Mobile devices (<= 767px) */
+  @media (max-width: 767px) {
+    .dashboard-main-content {
+      flex-direction: column;
+      padding: 20px 15px;
+      gap: 20px;
+    }
+  
+    .dashboard-profile-section {
+      padding: 10px;
+      margin-bottom: 15px;
+      width: 100%;
+    }
+  
+    .profile-pic-container {
+       width: 120px;
+       height: 120px;
+       margin: 10px 0;
+    }
+  
+    .profile-placeholder {
+        font-size: 3rem;
+    }
+  
+    .welcome-text {
+      font-size: 1.7rem;
+    }
+  
+    .welcome-subtext {
+      font-size: 1rem;
+    }
+  
+    .dashboard-feature-section {
+      gap: 15px;
+    }
+  
+    .dashboard-feature-card {
+       flex-direction: column; /* Stack icon and content vertically on mobile */
+       align-items: center;
+       text-align: center;
+       padding: 15px;
+    }
+  
+     .dashboard-feature-card:nth-child(odd),
+     .dashboard-feature-card:nth-child(even) {
+       flex-direction: column; /* Ensure vertical stacking */
+     }
+  
+    .dashboard-feature-icon {
+      width: 60px;
+      height: 60px;
+      font-size: 2rem;
+      margin: 0 0 10px 0; /* Add margin below icon, remove side margins */
+    }
+  
+    .dashboard-feature-card:nth-child(even) .dashboard-feature-icon {
+      margin: 0 0 10px 0; /* Ensure margin below icon for even cards too */
+    }
+  
+    .feature-title {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+  
+    .feature-description {
+      font-size: 0.9rem;
+    }
+  }
+  
+  /* Tablet devices (768px to 991px) */
+  @media (min-width: 768px) and (max-width: 991px) {
+    .dashboard-main-content {
+      flex-direction: column;
+      padding: 25px 20px;
+      gap: 25px;
+    }
+  
+    .dashboard-profile-section {
+      padding: 15px;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+  
+    .profile-pic-container {
+      width: 150px;
+      height: 150px;
+      margin: 15px 0;
+    }
+  
+    .profile-placeholder {
+        font-size: 3.5rem;
+    }
+  
+    .dashboard-feature-section {
+      gap: 20px;
+    }
+  
+     .dashboard-feature-card {
+       flex-direction: row;
+       text-align: left;
+       padding: 20px;
+     }
+  
+      .dashboard-feature-card:nth-child(odd) {
+        flex-direction: row;
+      }
+  
+      .dashboard-feature-card:nth-child(even) {
+        flex-direction: row-reverse;
+      }
+  
+     .dashboard-feature-icon {
+       width: 70px;
+       height: 70px;
+       font-size: 2.2rem;
+       margin-right: 15px;
+       margin-left: 0;
+     }
+  
+     .dashboard-feature-card:nth-child(even) .dashboard-feature-icon {
+       margin-right: 0;
+       margin-left: 15px;
+     }
+  
+    .feature-title {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+  
+    .feature-description {
+      font-size: 0.92rem;
+    }
+  }
+  
+  /* Large devices (laptops and desktops, >= 992px) */
+  @media (min-width: 992px) {
+    .dashboard-main-content {
+      flex-direction: row;
+      padding: 30px 20px;
+      gap: 30px;
+    }
+  
+     .dashboard-profile-section {
+      padding: 20px;
+      margin-bottom: 0;
+       width: auto;
+     }
+  
+     .profile-pic-container {
+       width: 180px;
+       height: 180px;
+       margin: 20px 0;
+     }
+  
+      .profile-placeholder {
+         font-size: 4rem;
+      }
+  
+    .dashboard-feature-section {
+      gap: 25px;
+    }
+  
+    .dashboard-feature-card {
+       flex-direction: row;
+       text-align: left;
+       padding: 25px;
+     }
+  
+      .dashboard-feature-card:nth-child(odd) {
+        flex-direction: row;
+      }
+  
+      .dashboard-feature-card:nth-child(even) {
+        flex-direction: row-reverse;
+      }
+  
+     .dashboard-feature-icon {
+       width: 80px;
+       height: 80px;
+       font-size: 2.5rem;
+       margin-right: 20px;
+       margin-left: 0;
+     }
+  
+      .dashboard-feature-card:nth-child(even) .dashboard-feature-icon {
+       margin-right: 0;
+       margin-left: 20px;
+     }
+  
+    .feature-title {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+    }
+  
+    .feature-description {
+      font-size: 0.95rem;
+    }
+  }
