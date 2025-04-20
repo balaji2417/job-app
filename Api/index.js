@@ -321,6 +321,28 @@ app.get('/api/protected', requireAuth, (req, res) => {
   });
   
 
+  app.get("/api/myJobIds", requireAuth, async (req, res) => {
+    try {
+        const email = req.user.email;
+
+        const applications = await prisma.application.findMany({
+            where: {
+                userId: email
+            },
+            select: {
+                jobListingId: true
+            }
+        });
+
+        // Extract just job IDs into an array
+        const jobIds = applications.map(app => app.jobListingId);
+
+        res.json({ jobIds });
+    } catch (error) {
+        console.error("Error fetching job IDs:", error);
+        res.status(500).json({ error: "Failed to fetch job IDs." });
+    }
+});
 
 
 
