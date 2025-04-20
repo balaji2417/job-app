@@ -216,7 +216,13 @@ app.get('/api/protected', requireAuth, (req, res) => {
 });
 
 // POST endpoint: Create a new application (with userId passed in the request)
-app.post('/api/application', async (req, res) => {
+
+
+    
+  
+
+
+  app.post('/api/application', async (req, res) => {
     const {
       email,
       jobId,
@@ -231,9 +237,47 @@ app.post('/api/application', async (req, res) => {
     } = req.body;
   
     try {
+      // Step 1: Ensure platformName entry exists in the platformName table
+      await prisma.platformName.upsert({
+        where: { platformName: publisher },
+        update: {}, // no update needed
+        create: {
+          platformName: publisher,
+          createdDate: new Date()
+        }
+      });
+  
+      // Step 2: Check if an application exists for this user and platform
+      const existingApplication = await prisma.application.findFirst({
+        where: {
+          userId: email,
+          platformName: publisher
+        }
+      });
+  
+      if (existingApplication) {
+        // Step 3: If application exists, increment jobsApplied in PerformanceMetrics
+        await prisma.performanceMetrics.update({
+          where: {
+            userId_platformName: {
+              userId: email,
+              platformName: publisher
+            }
+          },
+          data: {
+            jobsApplied: {
+              increment: 1
+            }
+          }
+        });
+  
+        return res.status(200).json({ message: "Application already exists. Updated jobsApplied count." });
+      }
+  
+      // Step 4: If application doesn't exist, create a new application
       const newApplication = await prisma.application.create({
-        data: { 
-          userId: email, // ✅ directly from frontend
+        data: {
+          userId: email,
           jobListingId: jobId,
           status,
           dateApplied: new Date(dateApplied),
@@ -242,19 +286,44 @@ app.post('/api/application', async (req, res) => {
           jobName: jobTitle,
           companyName: employer_name,
           jobLink: apply_link,
-          platformName: publisher // FK to platformName table
+          platformName: publisher
+        }
+      });
+  
+      // Step 5: Update or create performanceMetrics for this user and platform
+      await prisma.performanceMetrics.upsert({
+        where: {
+          userId_platformName: {
+            userId: email,
+            platformName: publisher
+          }
+        },
+        update: {
+          jobsApplied: {
+            increment: 1
+          }
+        },
+        create: {
+          userId: email,
+          platformName: publisher,
+          totalJobsViewed: 0,
+          jobsApplied: 1,
+          rejections: 0,
+          interviews: 0
         }
       });
   
       return res.status(201).json(newApplication);
     } catch (error) {
-      console.error("Error inserting application:", error);
-      return res.status(500).json({ error: "Failed to insert application." });
+      console.error("Error inserting/updating application:", error);
+      return res.status(500).json({ error: "Failed to insert or update application." });
     }
   });
   
 
-      
+
+
+
 
 // Start the Express server
 const PORT = process.env.PORT || 5000;
