@@ -6,7 +6,7 @@ const JobListings = () => {
     const RAPIDAPI_KEY = '9fce43bfb1mshe32bdec8de47861p18c340jsnbebcf1630f65'; 
     
     const [jobs, setJobs] = useState([]);
-    const {user,insertApplication} = useAuthUser();
+    const {user,insertApplication,jobIds,getJobId} = useAuthUser();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedJob, setSelectedJob] = useState(null);
@@ -26,6 +26,16 @@ const JobListings = () => {
         { value: 'Indeed', label: 'Indeed' },
         { value: 'Glassdoor', label: 'Glassdoor' },
     ];
+    useEffect(() => {
+      getJobId();
+      if(jobIds != null) {
+        jobIds.forEach(id => {
+            setAppliedJobs(prev => new Set(prev).add(id));
+            
+        });
+      }
+     
+    }, [user,jobIds]);
 
     const fetchJobs = useCallback(async (pageNumber = 1, title = '', location = '') => {
         const cacheKey = `${pageNumber}-${title}-${location}`;
@@ -147,7 +157,7 @@ const JobListings = () => {
     };
    
     const handleMarkAsApplied = (jobId,jobTitle,publisher,employer_name,apply_link) => {
-        alert(jobId);
+        
         const currentDateTime = new Date().toLocaleString();
         insertApplication(user.email,jobId,'Applied',currentDateTime,currentDateTime,'Nothing',jobTitle,employer_name,apply_link,publisher)
         setAppliedJobs(prev => new Set(prev).add(jobId));

@@ -7,6 +7,7 @@ export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error_call, setErrorCall] = useState('');
   const [user, setUser] = useState(null);
+  const [jobIds, setJobIds] = useState(null);
   const [records,setRecords] = useState(null);
 
   // Use effect to show an alert when error_call changes
@@ -137,6 +138,24 @@ const updateRecord = async  (email,value,id,platformName) => {
     }
   };
 
+  const getJobId = async () => {
+    try{
+      const response = await fetch('http://localhost:5000/api/myJobIds', {
+        method: "GET",
+        credentials: "include",
+  
+      });
+      const data = await response.json();
+      setJobIds(data.jobIds)
+      
+    }
+    catch (error){
+
+        console.log("Error fetching Job Ids:",error);
+
+    }
+    
+  };
   const logout = async () => {
     await fetch(`http://localhost:5000/api/logout`, {
       method: "POST",
@@ -163,7 +182,7 @@ const updateRecord = async  (email,value,id,platformName) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, loading, user, login, register, logout,error_call,fetchRecords,insertApplication,records,updateRecord}}
+      value={{ isAuthenticated, loading, user,getJobId, jobIds,login, register, logout,error_call,fetchRecords,insertApplication,records,updateRecord}}
     >
       {children}
     </AuthContext.Provider>

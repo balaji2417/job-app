@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthUser } from "./AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// Custom CSS for the component
 const profileStyles = {
   container: {
     padding: '20px',
@@ -204,7 +203,7 @@ const Profile = () => {
     try {
       const newStatus = statusMap[id] || 'Interview Scheduled';
       await updateRecord(user.email, newStatus, id, platformName);
-      await fetchRecords(user.email);  // ensure fresh data
+      await fetchRecords(user.email);  
     } catch (error) {
       console.error('Error updating status or fetching records:', error);
     }
