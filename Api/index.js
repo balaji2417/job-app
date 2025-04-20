@@ -188,9 +188,9 @@ app.post("/api/updateRecord", async (req, res) => {
         });
 
         if (value === 'Rejected' || value === 'Selected') {
-            // Update UserStats accordingly
-            await prisma.performancemetrics.update({
-                where: { userId_platformName: { userId, platformName } },
+            
+            await prisma.performanceMetrics.update({
+                where: { userId_platformName: { userId: email, platformName: platformName } },
                 data: value === 'Rejected'
                     ? { rejections: { increment: 1 } }
                     : { interviews: { increment: 1 } }
@@ -271,7 +271,7 @@ app.get('/api/protected', requireAuth, (req, res) => {
           }
         });
   
-        return res.status(200).json({ message: "Application already exists. Updated jobsApplied count." });
+       
       }
   
       // Step 4: If application doesn't exist, create a new application
