@@ -20,11 +20,15 @@ const Profile = () => {
   const handleStatusChange = (id, newStatus) => {
     setStatusMap(prev => ({ ...prev, [id]: newStatus }));
   };
+  
+  const gotoWebsite = (link) => {
+    window.open(link, '_blank');
+  }
 
-  const handleUpdateClick = async (id) => {
+  const handleUpdateClick = async (id,platformName) => {
     try {
       const newStatus = statusMap[id] || 'Interview Scheduled';
-      await updateRecord(user.email, newStatus, id);
+      await updateRecord(user.email, newStatus, id,platformName);
       await fetchRecords(user.email);  // ensure fresh data
     } catch (error) {
       console.error('Error updating status or fetching records:', error);
@@ -39,6 +43,9 @@ const Profile = () => {
           <th>Job Name</th>
           <th>Status</th>
           <th>Date Applied</th>
+          <th>Company Name</th>
+          <th> Link</th>
+          <th>Platform Name</th>
           <th>Change Status</th>
           <th>Update</th>
         </tr>
@@ -51,6 +58,16 @@ const Profile = () => {
               <td>{record.jobName}</td>
               <td>{record.status}</td>
               <td>{record.dateApplied}</td>
+              <td>{record.companyName}</td>
+              <td>
+              <button 
+      onClick={() => gotoWebsite(record.jobLink)} 
+      className="btn btn-primary"
+    >
+      Job Link
+    </button>
+              </td>
+              <td>{record.platformName}</td>
               <td>
                 <select
                   className="form-select"
@@ -65,7 +82,7 @@ const Profile = () => {
               <td>
                 <button 
                   className="mark-update"
-                  onClick={() => handleUpdateClick(record.jobListingId)}
+                  onClick={() => handleUpdateClick(record.jobListingId,record.platformName)}
                 >
                   Update
                 </button>

@@ -101,12 +101,12 @@ export function AuthProvider({ children }) {
     }
 };
 
-const updateRecord = async  (email,value,id) => {
+const updateRecord = async  (email,value,id,platformName) => {
   const res = await fetch('http://localhost:5000/api/updateRecord', {
     method: "POST",
     credentials: "include",
     headers: {"Content-Type": "application/json" },
-    body:JSON.stringify({email,value,id}),
+    body:JSON.stringify({email,value,id,platformName}),
 
   });
 }

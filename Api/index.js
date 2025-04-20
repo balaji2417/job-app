@@ -174,7 +174,7 @@ app.post("/api/getRecords",async (req,res) => {
     }
 });
 app.post("/api/updateRecord", async (req, res) => {
-    const { email, value, id } = req.body;  
+    const { email, value, id,platformName } = req.body;  
 
     try {
         const updatedRecord = await prisma.Application.update({
@@ -187,7 +187,15 @@ app.post("/api/updateRecord", async (req, res) => {
             data: { status: value } 
         });
 
-       
+        if (value === 'Rejected' || value === 'Selected') {
+            // Update UserStats accordingly
+            await prisma.performancemetrics.update({
+                where: { userId_platformName: { userId, platformName } },
+                data: value === 'Rejected'
+                    ? { rejections: { increment: 1 } }
+                    : { interviews: { increment: 1 } }
+            });
+        }        
     } 
     catch (error) {
         console.error(error);
