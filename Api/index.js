@@ -363,7 +363,9 @@ app.post('/api/application', async (req, res) => {
   }
 });
 
-
+app.get('/', (req, res) => {
+  res.send('API is working 🚀');
+});
 
 
 
