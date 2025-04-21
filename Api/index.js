@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: 'http://localhost:3000', // React app's URL
+    origin: 'https://job-app-rynm.onrender.com', // React app's URL
     methods: ['POST', 'GET'],
     credentials: true,  // Allow cookies to be sent with the request
 }));
