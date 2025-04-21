@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './JobListings.css';
 import { useAuthUser } from "./AuthContext";
 
+
 const JobListings = () => {
-    const RAPIDAPI_KEY = '3867d652f9msh2cb46249d80dd76p181442jsnd12b0d1d05e9'; 
+    
+    const RAPIDAPI_KEY = process.env.REACT_APP_RAPID_API_KEY;
     
     const [jobs, setJobs] = useState([]);
     const {user,insertApplication} = useAuthUser();

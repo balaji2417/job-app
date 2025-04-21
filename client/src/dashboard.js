@@ -1,5 +1,5 @@
 // import React, { useState, useEffect } from 'react'; // No need for useState/useEffect for responsiveStyles anymore
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthUser } from "./AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css"; // Keep Bootstrap if you use other components from it
@@ -8,6 +8,13 @@ import './dashboard.css'; // Import the new CSS file
 const Dashboard = () => {
   const { user } = useAuthUser();
   const navigate = useNavigate();
+  const [letter,setLetter] = useState();
+  useEffect( () => {
+    if(user && user.firstName) {
+      setLetter(user.firstName.charAt(0).toUpperCase())
+    }
+      
+  },[]);
 
   // Navigate to different sections
   const navigateTo = (path) => {
@@ -50,7 +57,7 @@ const Dashboard = () => {
               />
             ) : (
               <div className="profile-placeholder">
-                {user && user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                {letter}
               </div>
             )}
           </div>

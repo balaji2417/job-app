@@ -237,7 +237,7 @@ app.post("/api/deleteRecord", async (req, res) => {
             }
         }
     });
-    console.log("Deleted Successfully");
+
   }
     catch(error) {
         return;
