@@ -1,9 +1,9 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+require('dotenv').config(); // Load environment variables
 
 // Initialize Prisma Client and Express app
 const prisma = new PrismaClient();
@@ -12,14 +12,17 @@ const app = express();
 // Middleware to parse JSON request bodies and cookies
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
+
+// CORS configuration
+const corsOptions = {
     origin: 'https://job-portal-peach-zeta.vercel.app', // React app's URL
-    methods: ['POST', 'GET'],
-    credentials: true,  // Allow cookies to be sent with the request
-}));
+    methods: ['POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'], // Include all necessary methods
+    credentials: true, // Allow cookies to be sent with the request
+};
+app.use(cors(corsOptions));
 
 // Secret key for JWT (should be stored in an environment variable in production)
-const JWT_SECRET = '][q,s^z4X_J|5c[';
+const JWT_SECRET = process.env.JWT_SECRET || '][q,s^z4X_J|5c['; // Use env variable with a fallback
 
 // Helper function to generate JWT
 const generateToken = (user) => {
@@ -39,89 +42,55 @@ const requireAuth = (req, res, next) => {
         if (err) {
             return res.status(401).json({ message: "Invalid token" });
         }
-        // Attach user info to request object (match the structure in professor's example)
         req.user = decoded; // Attach the decoded user info (email)
         next();
     });
 };
 
-
 app.get("/api/myJobIds", requireAuth, async (req, res) => {
-  try {
-      const email = req.user.email;
-
-      const applications = await prisma.application.findMany({
-          where: {
-              userId: email
-          },
-          select: {
-              jobListingId: true
-          }
-      });
-
-      // Extract just job IDs into an array
-      const jobIds = applications.map(app => app.jobListingId);
-
-      res.json({ jobIds });
-  } catch (error) {
-      console.error("Error fetching job IDs:", error);
-      res.status(500).json({ error: "Failed to fetch job IDs." });
-  }
+    try {
+        const email = req.user.email;
+        const applications = await prisma.application.findMany({
+            where: { userId: email },
+            select: { jobListingId: true }
+        });
+        const jobIds = applications.map(app => app.jobListingId);
+        res.json({ jobIds });
+    } catch (error) {
+        console.error("Error fetching job IDs:", error);
+        res.status(500).json({ error: "Failed to fetch job IDs." });
+    }
 });
 
-// POST endpoint: Register a new user (without hashing the password)
+// POST endpoint: Register a new user (without hashing the password - WARNING!)
 app.post('/api/register', async (req, res) => {
     const { email, password, firstName, lastName, dob } = req.body;
 
-    // Validate that all required fields are provided
     if (!email || !password || !firstName || !lastName || !dob) {
         return res.status(400).json({ message: "All fields are required." });
     }
 
-    // Validate and parse the dateOfBirth
     const parsedDate = new Date(dob);
-
-    // Check if the date is valid
     if (isNaN(parsedDate.getTime())) {
-        
         return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD." });
     }
 
     try {
-        // Check if the email is already in use
-        const existingUser = await prisma.user.findUnique({
-            where: { email: email }
-        });
-
+        const existingUser = await prisma.user.findUnique({ where: { email } });
         if (existingUser) {
-            
-            return res.status(409).json({ message: "Email is already registered. Please use a different email." });
+            return res.status(409).json({ message: "Email is already registered." });
         }
-    } catch (error) {
-        
-        return res.status(500).json({ message: "Error creating user." });
-    }
-
-    try {
-        // Create a new user with validated dateOfBirth
         const newUser = await prisma.user.create({
-            data: {
-                email: email,
-                password: password,  // Storing password in plaintext (not recommended)
-                firstName: firstName,
-                lastName: lastName,
-                dateOfBirth: parsedDate  // Ensured valid Date object
-            }
+            data: { email, password, firstName, lastName, dateOfBirth: parsedDate } // WARNING: Plaintext password
         });
-
         return res.status(201).json(newUser);
     } catch (error) {
-        
+        console.error("Error creating user:", error);
         return res.status(500).json({ message: "Error creating user." });
     }
 });
 
-// POST endpoint: Login a user (without password hashing)
+// POST endpoint: Login a user (without password hashing - WARNING!)
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -129,246 +98,177 @@ app.post('/api/login', async (req, res) => {
         return res.status(400).json({ message: "Email and password are required." });
     }
 
-    // ADD THIS CHECK: If there's already a valid token for a different user, block login
-    const existingToken = req.cookies.token;
-    if (existingToken) {
-        try {
-            const decoded = jwt.verify(existingToken, JWT_SECRET);
-            if (decoded.email !== email) {
-                return res.status(403).json({ message: "Another user is already logged in. Please logout first." });
-            }
-        } catch (err) {
-            // Token is invalid or expired — allow new login
-        }
-    }
-
     try {
-        const user = await prisma.user.findUnique({
-            where: { email: email },
-            select: { email: true, firstName: true, password: true },
-        });
-
-        if (user && user.password === password) {
+        const user = await prisma.user.findUnique({ where: { email }, select: { email: true, firstName: true, password: true } });
+        if (user && user.password === password) { // WARNING: Plaintext password comparison
             const token = generateToken(user);
-            res.cookie('token', token, { httpOnly: true, secure: true, maxAge: 3600000, sameSite: 'None', domain: 'https://job-portal-peach-zeta.vercel.app' }); // If on different subdomains
-
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: true, // Ensure HTTPS in production
+                maxAge: 3600000, // 1 hour expiry
+                sameSite: 'None', // Required for cross-site cookies (if frontend and backend are on different subdomains)
+                domain: '.job-portal-peach-zeta.vercel.app' // Specify the domain for the cookie
+            });
             return res.status(200).json({ message: "Login successful", user });
         } else {
             return res.status(401).json({ message: "Invalid email or password" });
         }
     } catch (error) {
-        
+        console.error("Error during login:", error);
         return res.status(500).json({ message: "Error during login" });
     }
 });
 
-// GET endpoint: Fetch authenticated user's data (using `requireAuth` middleware)
+// GET endpoint: Fetch authenticated user's data
 app.get("/api/me", requireAuth, async (req, res) => {
     try {
-        // Accessing `req.user.email` to find the authenticated user's data
-        const user = await prisma.user.findUnique({
-            where: { email: req.user.email },
-            select: { email: true, firstName: true }
-        });
-       
+        const user = await prisma.user.findUnique({ where: { email: req.user.email }, select: { email: true, firstName: true } });
         if (!user) {
-            
             return res.status(404).json({ error: "User not found" });
         }
-
         res.json(user);
     } catch (error) {
-       
+        console.error("Error fetching user data:", error);
         res.status(500).json({ error: "Error fetching user data" });
     }
 });
 
-app.post("/api/getRecords",async (req,res) => {
-    const {email} = req.body;
-    try
-    {
-        const records = await prisma.Application.findMany({
-            where:{userId:email}
+app.post("/api/getRecords", async (req, res) => {
+    const { email } = req.body;
+    try {
+        const records = await prisma.application.findMany({ where: { userId: email } });
+        res.json({ records });
+    } catch (error) {
+        console.error("Error fetching application records:", error);
+        res.status(500).json({ error: "Error fetching application records" });
+    }
+});
+
+app.post("/api/getCount", async (req, res) => {
+    const { email, platformName } = req.body;
+    try {
+        const records = await prisma.performanceMetrics.findUnique({
+            where: { userId_platformName: { userId: email, platformName: platformName } }
         });
-        res.json({records});
-        
-    }
-    catch (error) {
-        
-        res.status(500).json({ error: "Error fetching user data" });
+        res.json({ records });
+    } catch (error) {
+        console.error("Error fetching performance metrics:", error);
+        res.status(500).json({ error: "Error fetching performance metrics" });
     }
 });
 
-app.post("/api/getCount", async (req,res) => {
-  const {email,platformName} = req.body;
-  
-  try {
-    const records = await prisma.performanceMetrics.findUnique({
-        where :{
-          userId_platformName: {
-            userId: email,
-            platformName: platformName
-          }
-        }
-    });
-    res.json({records});
-  }
-  catch (error) {
-    
-    res.status(500).json({ error: "Error fetching user data" });
-}
-});
 app.post("/api/updateRecord", async (req, res) => {
-    const { email, value, id,platformName } = req.body;  
-
+    const { email, value, id, platformName } = req.body;
     try {
         const updatedRecord = await prisma.Application.update({
-            where: {
-                userId_jobListingId: {
-                  userId: email,
-                  jobListingId: id
-                }
-              },  
-            data: { status: value } 
+            where: { userId_jobListingId: { userId: email, jobListingId: id } },
+            data: { status: value }
         });
-
-        if (value === 'Rejected' || value === 'Selected') {
-            
+        if (value === 'Rejected' || value === 'Accepted') { // Assuming 'Selected' should be 'Accepted'
+            const incrementField = value === 'Rejected' ? { rejections: { increment: 1 } } : { interviews: { increment: 1 } };
             await prisma.performanceMetrics.update({
                 where: { userId_platformName: { userId: email, platformName: platformName } },
-                data: value === 'Rejected'
-                    ? { rejections: { increment: 1 } }
-                    : { interviews: { increment: 1 } }
+                data: incrementField
             });
-        }        
-    } 
-    catch (error) {
-        
-        res.status(500).json({ error: "Error updating user record" });
+        }
+        res.json(updatedRecord);
+    } catch (error) {
+        console.error("Error updating application record:", error);
+        res.status(500).json({ error: "Error updating application record" });
     }
 });
 
 app.post("/api/deleteRecord", async (req, res) => {
-  const { email,id,platformName } = req.body;  
-  try {
-    // 1. Find the record to get its status before deletion
-    const recordToDelete = await prisma.Application.delete({
-        where: {
-            userId_jobListingId: {
-                userId: email,
-                jobListingId: id
-            }
-        }
-    });
+    const { email, id, platformName } = req.body;
+    try {
+        const recordToDelete = await prisma.Application.findUnique({
+            where: { userId_jobListingId: { userId: email, jobListingId: id } }
+        });
 
-  }
-    catch(error) {
-        return;
+        if (!recordToDelete) {
+            return res.status(404).json({ error: "Record not found" });
+        }
+
+        await prisma.Application.delete({
+            where: { userId_jobListingId: { userId: email, jobListingId: id } }
+        });
+
+        // Decrement metrics based on the deleted record's status
+        if (recordToDelete.status === 'Rejected') {
+            await prisma.performanceMetrics.update({
+                where: { userId_platformName: { userId: email, platformName: platformName } },
+                data: { jobsApplied: { decrement: 1 }, rejections: { decrement: 1 } }
+            });
+        } else if (recordToDelete.status === 'Accepted') { // Assuming 'Selected' should be 'Accepted'
+            await prisma.performanceMetrics.update({
+                where: { userId_platformName: { userId: email, platformName: platformName } },
+                data: { jobsApplied: { decrement: 1 }, interviews: { decrement: 1 } }
+            });
+        } else {
+            await prisma.performanceMetrics.update({
+                where: { userId_platformName: { userId: email, platformName: platformName } },
+                data: { jobsApplied: { decrement: 1 } }
+            });
+        }
+
+        res.json({ message: "Record deleted and metrics updated" });
+    } catch (error) {
+        console.error("Error deleting record:", error);
+        res.status(500).json({ error: "Error deleting record" });
     }
- 
 });
+
 app.post('/api/logout', (req, res) => {
-   
-    res.clearCookie('token');
+    res.clearCookie('token', { path: '/', domain: '.job-portal-peach-zeta.vercel.app', secure: true, httpOnly: true, sameSite: 'None' });
     return res.status(200).json({ message: "Logged out successfully" });
 });
 
 // Example of a protected route
 app.get('/api/protected', requireAuth, (req, res) => {
-    // This route is protected and requires a valid token
     res.status(200).json({ message: "Protected route accessed", user: req.user });
 });
 
-// POST endpoint: Create a new application (with userId passed in the request)
-
-
-    
-  
-
-
 app.post('/api/application', async (req, res) => {
-  const {
-    email,
-    jobId,
-    status,
-    dateApplied,
-    dateUpdated,
-    notes,
-    jobTitle,
-    employer_name,
-    apply_link,
-    publisher
-  } = req.body;
- 
-  try {
-    await prisma.platformName.upsert({
-      where: { platformName: publisher },
-      update: {},
-      create: {
-        platformName: publisher,
-        createdDate: new Date()
-      }
-    });
- 
-    // Check if application already exists
-    const existingApplication = await prisma.application.findFirst({
-      where: {
-        userId: email,
-        platformName: publisher
-      }
-    });
- 
-    // Create new application
-    const newApplication = await prisma.application.create({
-      data: {
-        userId: email,
-        jobListingId: jobId,
-        status,
-        dateApplied: new Date(dateApplied),
-        dateUpdated: dateUpdated ? new Date(dateUpdated) : null,
-        notes: notes || null,
-        jobName: jobTitle,
-        companyName: employer_name,
-        jobLink: apply_link,
-        platformName: publisher
-      }
-    });
- 
-    // Always upsert performance metrics (handles both create and update)
-    await prisma.performanceMetrics.upsert({
-      where: {
-        userId_platformName: {
-          userId: email,
-          platformName: publisher
-        }
-      },
-      update: {
-        jobsApplied: {
-          increment: 1
-        }
-      },
-      create: {
-        userId: email,
-        platformName: publisher,
-        totalJobsViewed: 0,
-        jobsApplied: 1,
-        rejections: 0,
-        interviews: 0
-      }
-    });
- 
-    return res.status(201).json(newApplication);
-  } catch (error) {
-    
-    return res.status(500).json({ error: "Failed to insert or update application." });
-  }
+    const { email, jobId, status, dateApplied, dateUpdated, notes, jobTitle, employer_name, apply_link, publisher } = req.body;
+
+    try {
+        await prisma.platformName.upsert({
+            where: { platformName: publisher },
+            update: {},
+            create: { platformName: publisher, createdDate: new Date() }
+        });
+
+        const newApplication = await prisma.application.create({
+            data: {
+                userId: email,
+                jobListingId: jobId,
+                status,
+                dateApplied: new Date(dateApplied),
+                dateUpdated: dateUpdated ? new Date(dateUpdated) : null,
+                notes: notes || null,
+                jobName: jobTitle,
+                companyName: employer_name,
+                jobLink: apply_link,
+                platformName: publisher
+            }
+        });
+
+        await prisma.performanceMetrics.upsert({
+            where: { userId_platformName: { userId: email, platformName: publisher } },
+            update: { jobsApplied: { increment: 1 } },
+            create: { userId: email, platformName: publisher, totalJobsViewed: 0, jobsApplied: 1, rejections: 0, interviews: 0 }
+        });
+
+        return res.status(201).json(newApplication);
+    } catch (error) {
+        console.error("Error creating application:", error);
+        return res.status(500).json({ error: "Failed to insert or update application." });
+    }
 });
 
 app.get('/', (req, res) => {
-  res.send('API is working 🚀');
+    res.send('API is working 🚀');
 });
-
-
 
 // Start the Express server
 const PORT = process.env.PORT || 4000;
