@@ -177,27 +177,33 @@ const Profile = () => {
   const [responsiveStyles, setResponsiveStyles] = useState(getResponsiveStyles());
   const [localFinishedJobs, setFinishedJobs] = useState(new Set());
 
+  useEffect(() => {
+    const fetchFinishedJobs = async () => {
+      getFinishedJobs();
+      
+        alert("Finished Jobs there");
+        finishedJobs.forEach(id=> {
+          setAppliedJobs(prev => new Set(prev).add(id));
+        })
+        
+      
+    };
+    fetchFinishedJobs();
+  }, [user]);  
+  
 
   useEffect(() => {
     if (user && user.email) {
       fetchRecords(user.email);
     }
-    getFinishedJobs();
-   if(finishedJobs != null) {
-    finishedJobs.forEach(id => {
-      setFinishedJobs(prev => new Set(prev).add(id));
-      
-  });
-}
-    
-    // Handle responsive design
+  
     const handleResize = () => {
       setResponsiveStyles(getResponsiveStyles());
     };
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [user, fetchRecords,finishedJobs]);
+  }, [user, fetchRecords]);
 
   const handleStatusChange = (id, newStatus) => {
     setStatusMap(prev => ({ ...prev, [id]: newStatus }));
@@ -210,7 +216,12 @@ const Profile = () => {
   const handleUpdateClick = async (id, platformName) => {
     try {
       const newStatus = statusMap[id] || 'Interview Scheduled';
-      setFinishedJobs(prev => new Set(prev).add(id));
+      alert(newStatus);
+      if(newStatus == 'Selected' || newStatus == 'Rejected') {
+        alert(localFinishedJobs)
+        setFinishedJobs(prev => new Set(prev).add(id));
+      }
+      
       await updateRecord(user.email, newStatus, id, platformName);
       await fetchRecords(user.email);  
     } catch (error) {
@@ -268,7 +279,7 @@ const Profile = () => {
   };
 
   const isJobFinished = (jobId) => {
-    
+    console.log("Job Id",localFinishedJobs.has(jobId));
     return localFinishedJobs.has(jobId);
 };
 

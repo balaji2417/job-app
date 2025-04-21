@@ -346,33 +346,33 @@ app.get('/api/protected', requireAuth, (req, res) => {
 
 
 app.get("/api/myJobIdsByStatus", requireAuth, async (req, res) => {
-  
-    try {
-      const email = req.user.email;
-      const { status } = req.query;
-  
-      if (!status || (status !== "selected" && status !== "rejected")) {
-        return res.status(400).json({ error: "Invalid or missing status parameter. Must be 'selected' or 'rejected'." });
-      }
-  
-      const filteredApplications = await prisma.application.findMany({
-        where: {
-          userId: email,
-          status: status
-        },
-        select: {
-          jobListingId: true
+  console.log("Inside");
+  try {
+    const email = req.user.email;
+
+    // Fetching all job IDs for the user, regardless of the status
+    const filteredApplications = await prisma.application.findMany({
+      where: {
+        userId: email,
+        status: {
+          in: ["Selected", "Rejected"] // You can still include only "selected" or "rejected" if needed
         }
-      });
-  
-      const jobIds = filteredApplications.map(app => app.jobListingId);
-  
-      res.json({ jobIds });
-    } catch (error) {
-      console.error("Error fetching filtered job IDs:", error);
-      res.status(500).json({ error: "Failed to fetch job IDs by status." });
-    }
-  });
+      },
+      select: {
+        jobListingId: true
+      }
+    });
+
+    // Extract the job IDs from the filtered applications
+    const jobIds = filteredApplications.map(app => app.jobListingId);
+    console.log(jobIds);
+    // Return the job IDs as a response
+    res.json({ jobIds });
+  } catch (error) {
+    console.error("Error fetching job IDs:", error);
+    res.status(500).json({ error: "Failed to fetch job IDs." });
+  }
+});
   
 
 // Start the Express server

@@ -147,6 +147,7 @@ const updateRecord = async  (email,value,id,platformName) => {
   
       });
       const data = await response.json();
+     
       setJobIds(data.jobIds)
       
     }
@@ -171,8 +172,10 @@ const updateRecord = async  (email,value,id,platformName) => {
         method: "GET",
         credentials: "include",
        });
+       
        const data = await response.json();
-       setFinishedJobs(response.jobIds);
+       
+       setFinishedJobs(data.jobIds);
     }
     catch(error) {
       console.log("Error fetching Job Ids:",error);
