@@ -219,7 +219,7 @@ app.post("/api/deleteRecord", async (req, res) => {
 });
 
 app.post('/api/logout', (req, res) => {
-    res.clearCookie('token', { path: '/', domain: '.job-portal-peach-zeta.vercel.app', secure: true, httpOnly: true, sameSite: 'None' });
+    res.clearCookie('token', { path: '/', secure: true, httpOnly: true, sameSite: 'None' });
     return res.status(200).json({ message: "Logged out successfully" });
 });
 
