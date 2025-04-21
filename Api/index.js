@@ -193,23 +193,7 @@ app.post("/api/deleteRecord", async (req, res) => {
             where: { userId_jobListingId: { userId: email, jobListingId: id } }
         });
 
-        // Decrement metrics based on the deleted record's status
-        if (recordToDelete.status === 'Rejected') {
-            await prisma.performanceMetrics.update({
-                where: { userId_platformName: { userId: email, platformName: platformName } },
-                data: { jobsApplied: { decrement: 1 }, rejections: { decrement: 1 } }
-            });
-        } else if (recordToDelete.status === 'Accepted') { // Assuming 'Selected' should be 'Accepted'
-            await prisma.performanceMetrics.update({
-                where: { userId_platformName: { userId: email, platformName: platformName } },
-                data: { jobsApplied: { decrement: 1 }, interviews: { decrement: 1 } }
-            });
-        } else {
-            await prisma.performanceMetrics.update({
-                where: { userId_platformName: { userId: email, platformName: platformName } },
-                data: { jobsApplied: { decrement: 1 } }
-            });
-        }
+      
 
         res.json({ message: "Record deleted and metrics updated" });
     } catch (error) {
