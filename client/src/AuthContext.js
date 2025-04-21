@@ -7,6 +7,7 @@ export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error_call, setErrorCall] = useState('');
   const [user, setUser] = useState(null);
+  const [jobIds,setJobIds] = useState(null);
   const [countStatus, setCountStatus] = useState(null);
   const [records,setRecords] = useState(null);
 
@@ -41,6 +42,25 @@ export function AuthProvider({ children }) {
 
     fetchUserData();
   }, []);
+
+  const getJobId = async () => {
+    try{
+      const response = await fetch('http://localhost:5000/api/myJobIds', {
+        method: "GET",
+        credentials: "include",
+ 
+      });
+      const data = await response.json();
+      setJobIds(data.jobIds)
+     
+    }
+    catch (error){
+ 
+        console.log("Error fetching Job Ids:",error);
+ 
+    }
+   
+  };
 
   const getCountStatus = async (email,platformName) => {
     try {
@@ -93,7 +113,7 @@ export function AuthProvider({ children }) {
       });
   
       if (res.ok) {
-        alert("Data Inserted!");
+        return;
       } else {
         console.error("Insert failed with status:", res.status);
       }
@@ -112,11 +132,10 @@ export function AuthProvider({ children }) {
             body: JSON.stringify({ email }),
         });
 
-        console.log("Fetch response:", res);
-
+       
         if (res.ok) {
             const userData = await res.json();
-            console.log("Received data:", userData);
+            
             setRecords(userData.records);
         } else {
             console.log("Server error, status:", res.status);
@@ -197,7 +216,7 @@ const deleteRecord = async (email,id,platformName) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, loading, deleteRecord, getCountStatus,countStatus, user, login, register, logout,error_call,fetchRecords,insertApplication,records,updateRecord}}
+      value={{ isAuthenticated, loading, deleteRecord, jobIds, getJobId, getCountStatus,countStatus, user, login, register, logout,error_call,fetchRecords,insertApplication,records,updateRecord}}
     >
       {children}
     </AuthContext.Provider>

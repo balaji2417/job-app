@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaUserCircle, FaBars } from 'react-icons/fa';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+
 
 const TopNav = () => { 
     const navigate = useNavigate();
@@ -30,13 +30,7 @@ const TopNav = () => {
         window.dispatchEvent(new Event('storage'));
     };
     
-    const gotoProfile = async () => {
-        navigate('/joblist/profile');
-    };
-    
-    const gotoHomeJob = async () => {
-        navigate('/joblist');
-    };
+
     
     const gotoDashboard = async () => {
         navigate('/joblist');

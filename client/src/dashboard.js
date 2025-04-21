@@ -1,9 +1,9 @@
-// import React, { useState, useEffect } from 'react'; // No need for useState/useEffect for responsiveStyles anymore
+
 import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthUser } from "./AuthContext";
-import "bootstrap/dist/css/bootstrap.min.css"; // Keep Bootstrap if you use other components from it
-import './dashboard.css'; // Import the new CSS file
+import "bootstrap/dist/css/bootstrap.min.css"; 
+import './dashboard.css'; 
 
 const Dashboard = () => {
   const { user } = useAuthUser();
@@ -16,16 +16,16 @@ const Dashboard = () => {
       
   },[]);
 
-  // Navigate to different sections
+  
   const navigateTo = (path) => {
     navigate(path);
   };
 
-  // Card background colors (applied via inline style for now, could also move to CSS if needed)
+ 
    const cardBackgroundColors = [
-     'rgba(208, 190, 190, 0.5)', // LightBlue
-     'rgba(255, 182, 193, 0.5)', // LightPink
-     'rgba(152, 251, 152, 0.5)'  // PaleGreen
+     'rgba(208, 190, 190, 0.5)', 
+     'rgba(255, 182, 193, 0.5)', 
+     'rgba(152, 251, 152, 0.5)'  
    ];
 
     // Icon background colors (applied via inline style for now)
@@ -74,13 +74,13 @@ const Dashboard = () => {
           {/* Job Search Feature */}
           <div
             className="dashboard-feature-card"
-            style={{ backgroundColor: cardBackgroundColors[0] }} // Apply background color here
+            style={{ backgroundColor: cardBackgroundColors[0] }} 
             onClick={() => navigateTo('/joblist/jobsearch')}
             // Remove onMouseEnter/onMouseLeave - handled by CSS :hover
           >
             <div
                 className="dashboard-feature-icon"
-                style={{ backgroundColor: iconBackgroundColors[0] }} // Apply icon background color here
+                style={{ backgroundColor: iconBackgroundColors[0] }} 
             >
               🔍
             </div>
@@ -139,8 +139,5 @@ const Dashboard = () => {
   );
 };
 
-// Remove the old dashboardStyles object and getResponsiveStyles function
-// const dashboardStyles = { ... };
-// const getResponsiveStyles = () => { ... };
 
 export default Dashboard;

@@ -8,7 +8,7 @@ const JobListings = () => {
     const RAPIDAPI_KEY = process.env.REACT_APP_RAPID_API_KEY;
     
     const [jobs, setJobs] = useState([]);
-    const {user,insertApplication} = useAuthUser();
+    const {user,insertApplication,jobIds,getJobId} = useAuthUser();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedJob, setSelectedJob] = useState(null);
@@ -28,6 +28,16 @@ const JobListings = () => {
         { value: 'Glassdoor', label: 'Glassdoor' },
     ];
 
+    useEffect(() => {
+        getJobId();
+        if(jobIds != null) {
+          jobIds.forEach(id => {
+              setAppliedJobs(prev => new Set(prev).add(id));
+             
+          });
+        }
+       
+      }, [user,jobIds]);
     const fetchJobs = useCallback(async (pageNumber = 1, title = '', location = '') => {
         const cacheKey = `${pageNumber}-${title}-${location}`;
 
@@ -40,9 +50,12 @@ const JobListings = () => {
             return;
         }
 
+       
         setLoading(true);
         setError(null);
         setSelectedJob(null);
+
+       
 
         try {
             let query = '';
@@ -148,7 +161,6 @@ const JobListings = () => {
     };
    
     const handleMarkAsApplied = (jobId,jobTitle,publisher,employer_name,apply_link) => {
-        alert(jobId);
         const currentDateTime = new Date().toLocaleString();
         insertApplication(user.email,jobId,'Applied',currentDateTime,currentDateTime,'Nothing',jobTitle,employer_name,apply_link,publisher)
         setAppliedJobs(prev => new Set(prev).add(jobId));
@@ -269,7 +281,7 @@ const JobListings = () => {
                                     </div>
                                 )) : (
                                     <div className="jl-no-results">
-                                        {searchExecuted || filters.title || filters.location ? 'No jobs found matching your criteria for this page.' : jobs.length === 0 && !loading ? 'No jobs found for the initial query.' : 'Please browse the next page'}
+                                        {searchExecuted || filters.title || filters.location ? 'Please browse the next page' : jobs.length === 0 && !loading ? 'No jobs found for the initial query.' : 'Please browse the next page'}
                                     </div>
                                 )}
                             </div>

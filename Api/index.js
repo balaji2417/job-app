@@ -46,6 +46,28 @@ const requireAuth = (req, res, next) => {
 };
 
 
+app.get("/api/myJobIds", requireAuth, async (req, res) => {
+  try {
+      const email = req.user.email;
+
+      const applications = await prisma.application.findMany({
+          where: {
+              userId: email
+          },
+          select: {
+              jobListingId: true
+          }
+      });
+
+      // Extract just job IDs into an array
+      const jobIds = applications.map(app => app.jobListingId);
+
+      res.json({ jobIds });
+  } catch (error) {
+      console.error("Error fetching job IDs:", error);
+      res.status(500).json({ error: "Failed to fetch job IDs." });
+  }
+});
 
 // POST endpoint: Register a new user (without hashing the password)
 app.post('/api/register', async (req, res) => {
@@ -61,7 +83,7 @@ app.post('/api/register', async (req, res) => {
 
     // Check if the date is valid
     if (isNaN(parsedDate.getTime())) {
-        console.log("Invalid date format. Use YYYY-MM-DD");
+        
         return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD." });
     }
 
@@ -72,11 +94,11 @@ app.post('/api/register', async (req, res) => {
         });
 
         if (existingUser) {
-            console.log("Existing User");
+            
             return res.status(409).json({ message: "Email is already registered. Please use a different email." });
         }
     } catch (error) {
-        console.error(error);
+        
         return res.status(500).json({ message: "Error creating user." });
     }
 
@@ -94,7 +116,7 @@ app.post('/api/register', async (req, res) => {
 
         return res.status(201).json(newUser);
     } catch (error) {
-        console.error(error);
+        
         return res.status(500).json({ message: "Error creating user." });
     }
 });
@@ -134,7 +156,7 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ message: "Invalid email or password" });
         }
     } catch (error) {
-        console.error(error);
+        
         return res.status(500).json({ message: "Error during login" });
     }
 });
@@ -155,7 +177,7 @@ app.get("/api/me", requireAuth, async (req, res) => {
 
         res.json(user);
     } catch (error) {
-        console.error(error);
+       
         res.status(500).json({ error: "Error fetching user data" });
     }
 });
@@ -171,7 +193,7 @@ app.post("/api/getRecords",async (req,res) => {
         
     }
     catch (error) {
-        console.error(error);
+        
         res.status(500).json({ error: "Error fetching user data" });
     }
 });
@@ -191,7 +213,7 @@ app.post("/api/getCount", async (req,res) => {
     res.json({records});
   }
   catch (error) {
-    console.error(error);
+    
     res.status(500).json({ error: "Error fetching user data" });
 }
 });
@@ -220,7 +242,7 @@ app.post("/api/updateRecord", async (req, res) => {
         }        
     } 
     catch (error) {
-        console.error(error);
+        
         res.status(500).json({ error: "Error updating user record" });
     }
 });
@@ -336,7 +358,7 @@ app.post('/api/application', async (req, res) => {
  
     return res.status(201).json(newApplication);
   } catch (error) {
-    console.error("Error inserting/updating application:", error);
+    
     return res.status(500).json({ error: "Failed to insert or update application." });
   }
 });

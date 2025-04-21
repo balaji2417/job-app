@@ -5,7 +5,7 @@ function RequireAuth({ children }) {
   const { isAuthenticated, loading } = useAuthUser();
 
   if (loading) {
-    alert("Hello");
+    
     return (
       
       <div class="spinner-grow" role="status">

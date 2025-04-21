@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuthUser } from "./AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -237,13 +236,13 @@ const Profile = () => {
       await updateRecord(user.email, newStatus, id, platformName);
       await fetchRecords(user.email);  // ensure fresh data
     } catch (error) {
-      console.error('Error updating status or fetching records:', error);
+      return;
     }
   };
 
 const handleDeleteClick = async (id,platformName) => {
   try {
-    alert("Insode Delete");
+    
     const newStatus = statusMap[id] || 'Interview Scheduled';
     await deleteRecord(user.email,id,platformName);
     await fetchRecords(user.email);

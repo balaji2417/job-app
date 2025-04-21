@@ -48,7 +48,7 @@ export default function Login() {
     }
 
     if(password.includes(email) || password.length < 8) {
-      setError('Password should not contain username or password should be greater than 8');
+      setError('Password be greater than 8');
       return;
     }
 
