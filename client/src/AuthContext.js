@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
     const fetchUserData = async () => {
       setErrorCall('');
       try {
-        const res = await fetch(` http://localhost:5000/api/me`, {
+        const res = await fetch(`http://localhost:10000/api/me`, {
           credentials: "include",
         });
 
@@ -45,7 +45,7 @@ export function AuthProvider({ children }) {
 
   const getJobId = async () => {
     try{
-      const response = await fetch('http://localhost:5000/api/myJobIds', {
+      const response = await fetch('http://localhost:10000/api/myJobIds', {
         method: "GET",
         credentials: "include",
  
@@ -64,7 +64,7 @@ export function AuthProvider({ children }) {
 
   const getCountStatus = async (email,platformName) => {
     try {
-      const res = await fetch('http://localhost:5000/api/getCount', {
+      const res = await fetch('http://localhost:10000/api/getCount', {
         method: "POST",
         credentials: "include",
         headers: {
@@ -92,7 +92,7 @@ export function AuthProvider({ children }) {
     employer_name, apply_link, publisher
   ) => {
     try {
-      const res = await fetch('http://localhost:5000/api/application', {
+      const res = await fetch('http://localhost:10000/api/application', {
         method: "POST",
         credentials: "include",
         headers: {
@@ -125,7 +125,7 @@ export function AuthProvider({ children }) {
 
   const fetchRecords = async (email) => {
     try {
-        const res = await fetch('http://localhost:5000/api/getRecords', {
+        const res = await fetch('http://localhost:10000/api/getRecords', {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -146,7 +146,7 @@ export function AuthProvider({ children }) {
 };
 
 const updateRecord = async  (email,value,id,platformName) => {
-  const res = await fetch('http://localhost:5000/api/updateRecord', {
+  const res = await fetch('http://localhost:10000/api/updateRecord', {
     method: "POST",
     credentials: "include",
     headers: {"Content-Type": "application/json" },
@@ -156,7 +156,7 @@ const updateRecord = async  (email,value,id,platformName) => {
 }
 
 const deleteRecord = async (email,id,platformName) => {
-  const res = await fetch('http://localhost:5000/api/deleteRecord',{
+  const res = await fetch('http://localhost:10000/api/deleteRecord',{
     method: "POST",
     credentials: "include",
     headers: {"Content-Type": "application/json"},
@@ -164,7 +164,7 @@ const deleteRecord = async (email,id,platformName) => {
   });
 }
   const login = async (email, password) => {
-    const res = await fetch('http://localhost:5000/api/login', {
+    const res = await fetch('http://localhost:10000/api/login', {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -200,7 +200,7 @@ const deleteRecord = async (email,id,platformName) => {
 
   const register = async (email, password, firstName,lastName,dob) => {
     
-    const res = await fetch(`http://localhost:5000/api/register`, {
+    const res = await fetch(`http://localhost:10000/api/register`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
