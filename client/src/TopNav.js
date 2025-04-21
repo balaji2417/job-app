@@ -39,7 +39,7 @@ const TopNav = () => {
     };
     
     const gotoDashboard = async () => {
-        navigate('/joblist/dashboard');
+        navigate('/joblist');
     };
     
     return (
@@ -147,15 +147,11 @@ const TopNav = () => {
                             </Dropdown.Toggle>
                             
                             <Dropdown.Menu align="end">
-                                <Dropdown.Item onClick={gotoHomeJob}>
-                                    <i className="bi bi-house-door me-2"></i> Home
-                                </Dropdown.Item>
+                                
                                 <Dropdown.Item onClick={gotoDashboard}>
                                     <i className="bi bi-speedometer2 me-2"></i> Dashboard
                                 </Dropdown.Item>
-                                <Dropdown.Item onClick={gotoProfile}>
-                                    <i className="bi bi-person me-2"></i> Profile
-                                </Dropdown.Item>
+                                
                                 <Dropdown.Divider />
                                 <Dropdown.Item onClick={handleLogout} className="text-danger">
                                     <i className="bi bi-box-arrow-right me-2"></i> Logout

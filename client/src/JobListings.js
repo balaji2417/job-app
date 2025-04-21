@@ -3,7 +3,7 @@ import './JobListings.css';
 import { useAuthUser } from "./AuthContext";
 
 const JobListings = () => {
-    const RAPIDAPI_KEY = '9fce43bfb1mshe32bdec8de47861p18c340jsnbebcf1630f65'; 
+    const RAPIDAPI_KEY = '3867d652f9msh2cb46249d80dd76p181442jsnd12b0d1d05e9'; 
     
     const [jobs, setJobs] = useState([]);
     const {user,insertApplication} = useAuthUser();

@@ -45,6 +45,8 @@ const requireAuth = (req, res, next) => {
     });
 };
 
+
+
 // POST endpoint: Register a new user (without hashing the password)
 app.post('/api/register', async (req, res) => {
     const { email, password, firstName, lastName, dob } = req.body;
@@ -173,6 +175,26 @@ app.post("/api/getRecords",async (req,res) => {
         res.status(500).json({ error: "Error fetching user data" });
     }
 });
+
+app.post("/api/getCount", async (req,res) => {
+  const {email,platformName} = req.body;
+  
+  try {
+    const records = await prisma.performanceMetrics.findUnique({
+        where :{
+          userId_platformName: {
+            userId: email,
+            platformName: platformName
+          }
+        }
+    });
+    res.json({records});
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error fetching user data" });
+}
+});
 app.post("/api/updateRecord", async (req, res) => {
     const { email, value, id,platformName } = req.body;  
 
@@ -222,104 +244,83 @@ app.get('/api/protected', requireAuth, (req, res) => {
   
 
 
-  app.post('/api/application', async (req, res) => {
-    const {
-      email,
-      jobId,
-      status,
-      dateApplied,
-      dateUpdated,
-      notes,
-      jobTitle,
-      employer_name,
-      apply_link,
-      publisher
-    } = req.body;
-  
-    try {
-      // Step 1: Ensure platformName entry exists in the platformName table
-      await prisma.platformName.upsert({
-        where: { platformName: publisher },
-        update: {}, // no update needed
-        create: {
-          platformName: publisher,
-          createdDate: new Date()
-        }
-      });
-  
-      // Step 2: Check if an application exists for this user and platform
-      const existingApplication = await prisma.application.findFirst({
-        where: {
-          userId: email,
-          platformName: publisher
-        }
-      });
-  
-      if (existingApplication) {
-        // Step 3: If application exists, increment jobsApplied in PerformanceMetrics
-        await prisma.performanceMetrics.update({
-          where: {
-            userId_platformName: {
-              userId: email,
-              platformName: publisher
-            }
-          },
-          data: {
-            jobsApplied: {
-              increment: 1
-            }
-          }
-        });
-  
-       
+app.post('/api/application', async (req, res) => {
+  const {
+    email,
+    jobId,
+    status,
+    dateApplied,
+    dateUpdated,
+    notes,
+    jobTitle,
+    employer_name,
+    apply_link,
+    publisher
+  } = req.body;
+ 
+  try {
+    await prisma.platformName.upsert({
+      where: { platformName: publisher },
+      update: {},
+      create: {
+        platformName: publisher,
+        createdDate: new Date()
       }
-  
-      // Step 4: If application doesn't exist, create a new application
-      const newApplication = await prisma.application.create({
-        data: {
+    });
+ 
+    // Check if application already exists
+    const existingApplication = await prisma.application.findFirst({
+      where: {
+        userId: email,
+        platformName: publisher
+      }
+    });
+ 
+    // Create new application
+    const newApplication = await prisma.application.create({
+      data: {
+        userId: email,
+        jobListingId: jobId,
+        status,
+        dateApplied: new Date(dateApplied),
+        dateUpdated: dateUpdated ? new Date(dateUpdated) : null,
+        notes: notes || null,
+        jobName: jobTitle,
+        companyName: employer_name,
+        jobLink: apply_link,
+        platformName: publisher
+      }
+    });
+ 
+    // Always upsert performance metrics (handles both create and update)
+    await prisma.performanceMetrics.upsert({
+      where: {
+        userId_platformName: {
           userId: email,
-          jobListingId: jobId,
-          status,
-          dateApplied: new Date(dateApplied),
-          dateUpdated: dateUpdated ? new Date(dateUpdated) : null,
-          notes: notes || null,
-          jobName: jobTitle,
-          companyName: employer_name,
-          jobLink: apply_link,
           platformName: publisher
         }
-      });
-  
-      // Step 5: Update or create performanceMetrics for this user and platform
-      await prisma.performanceMetrics.upsert({
-        where: {
-          userId_platformName: {
-            userId: email,
-            platformName: publisher
-          }
-        },
-        update: {
-          jobsApplied: {
-            increment: 1
-          }
-        },
-        create: {
-          userId: email,
-          platformName: publisher,
-          totalJobsViewed: 0,
-          jobsApplied: 1,
-          rejections: 0,
-          interviews: 0
+      },
+      update: {
+        jobsApplied: {
+          increment: 1
         }
-      });
-  
-      return res.status(201).json(newApplication);
-    } catch (error) {
-      console.error("Error inserting/updating application:", error);
-      return res.status(500).json({ error: "Failed to insert or update application." });
-    }
-  });
-  
+      },
+      create: {
+        userId: email,
+        platformName: publisher,
+        totalJobsViewed: 0,
+        jobsApplied: 1,
+        rejections: 0,
+        interviews: 0
+      }
+    });
+ 
+    return res.status(201).json(newApplication);
+  } catch (error) {
+    console.error("Error inserting/updating application:", error);
+    return res.status(500).json({ error: "Failed to insert or update application." });
+  }
+});
 
 
 

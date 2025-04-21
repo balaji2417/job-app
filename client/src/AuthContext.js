@@ -7,6 +7,7 @@ export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error_call, setErrorCall] = useState('');
   const [user, setUser] = useState(null);
+  const [countStatus, setCountStatus] = useState(null);
   const [records,setRecords] = useState(null);
 
   // Use effect to show an alert when error_call changes
@@ -41,6 +42,30 @@ export function AuthProvider({ children }) {
     fetchUserData();
   }, []);
 
+  const getCountStatus = async (email,platformName) => {
+    try {
+      const res = await fetch('http://localhost:5000/api/getCount', {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email,
+          platformName
+        }),
+      });
+  
+      if (res.ok) {
+        const userData = await res.json();
+        setCountStatus(userData.records);
+      } else {
+        console.error("Insert failed with status:", res.status);
+      }
+    } catch (error) {
+      console.error("Fetch failed:", error);
+    }
+  };
   const insertApplication = async (
     email, jobId, status, currentDateTime,
     dateUpdated, notes, jobTitle,
@@ -163,7 +188,7 @@ const updateRecord = async  (email,value,id,platformName) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, loading, user, login, register, logout,error_call,fetchRecords,insertApplication,records,updateRecord}}
+      value={{ isAuthenticated, loading, getCountStatus,countStatus, user, login, register, logout,error_call,fetchRecords,insertApplication,records,updateRecord}}
     >
       {children}
     </AuthContext.Provider>

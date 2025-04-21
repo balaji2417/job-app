@@ -12,8 +12,10 @@ import Login from './Login';
 import TopNav from './TopNav';
 import Profile from './profile';
 import Home from './Home';
-import RequireAuth from './RequireAuth'
+import RequireAuth from './RequireAuth';
 import JobListings from './JobListings';
+import Dashboard from './dashboard';
+import Metrics from './metrics';
  
 // Create a root element to render the app
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -33,8 +35,10 @@ root.render(
     
     
     } >
-    <Route index element = { <JobListings />}/>
+    <Route index element = { <Dashboard />}/>
     <Route path="profile"  element = { <Profile />}/>
+    <Route path="jobsearch"  element = { < JobListings/>}/>
+    <Route path="metrics"  element = { < Metrics/>}/>
 </Route>
 </Routes>
 </BrowserRouter>

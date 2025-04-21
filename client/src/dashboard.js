@@ -68,7 +68,7 @@ const Dashboard = () => {
           <div
             className="dashboard-feature-card"
             style={{ backgroundColor: cardBackgroundColors[0] }} // Apply background color here
-            onClick={() => navigateTo('/job-search')}
+            onClick={() => navigateTo('/joblist/jobsearch')}
             // Remove onMouseEnter/onMouseLeave - handled by CSS :hover
           >
             <div
@@ -89,7 +89,7 @@ const Dashboard = () => {
           <div
             className="dashboard-feature-card"
              style={{ backgroundColor: cardBackgroundColors[1] }}
-            onClick={() => navigateTo('/metrics')}
+            onClick={() => navigateTo('/joblist/metrics')}
             // Remove onMouseEnter/onMouseLeave
           >
             <div
@@ -110,7 +110,7 @@ const Dashboard = () => {
           <div
             className="dashboard-feature-card"
              style={{ backgroundColor: cardBackgroundColors[2] }}
-            onClick={() => navigateTo('/applications')}
+            onClick={() => navigateTo('/joblist/profile')}
             // Remove onMouseEnter/onMouseLeave
           >
              <div
