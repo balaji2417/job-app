@@ -107,7 +107,7 @@ app.post('/api/login', async (req, res) => {
                 secure: true, // Ensure HTTPS in production
                 maxAge: 3600000, // 1 hour expiry
                 sameSite: 'None', // Required for cross-site cookies (if frontend and backend are on different subdomains)
-                domain: '.job-portal-peach-zeta.vercel.app' // Specify the domain for the cookie
+                
             });
             return res.status(200).json({ message: "Login successful", user });
         } else {
