@@ -135,6 +135,15 @@ const updateRecord = async  (email,value,id,platformName) => {
 
   });
 }
+
+const deleteRecord = async (email,id,platformName) => {
+  const res = await fetch('http://localhost:5000/api/deleteRecord',{
+    method: "POST",
+    credentials: "include",
+    headers: {"Content-Type": "application/json"},
+    body:JSON.stringify({email,id,platformName}),
+  });
+}
   const login = async (email, password) => {
     const res = await fetch('http://localhost:5000/api/login', {
       method: "POST",
@@ -188,7 +197,7 @@ const updateRecord = async  (email,value,id,platformName) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, loading, getCountStatus,countStatus, user, login, register, logout,error_call,fetchRecords,insertApplication,records,updateRecord}}
+      value={{ isAuthenticated, loading, deleteRecord, getCountStatus,countStatus, user, login, register, logout,error_call,fetchRecords,insertApplication,records,updateRecord}}
     >
       {children}
     </AuthContext.Provider>

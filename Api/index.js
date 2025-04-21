@@ -225,6 +225,25 @@ app.post("/api/updateRecord", async (req, res) => {
     }
 });
 
+app.post("/api/deleteRecord", async (req, res) => {
+  const { email,id,platformName } = req.body;  
+  try {
+    // 1. Find the record to get its status before deletion
+    const recordToDelete = await prisma.Application.delete({
+        where: {
+            userId_jobListingId: {
+                userId: email,
+                jobListingId: id
+            }
+        }
+    });
+    console.log("Deleted Successfully");
+  }
+    catch(error) {
+        return;
+    }
+ 
+});
 app.post('/api/logout', (req, res) => {
    
     res.clearCookie('token');

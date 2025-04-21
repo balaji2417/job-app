@@ -80,6 +80,18 @@ const profileStyles = {
     transition: 'background-color 0.2s',
     fontSize: '0.85rem',
   },
+  deleteButton :{
+    
+      padding: '6px 12px',
+      backgroundColor: 'red',
+      color: 'white',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      transition: 'background-color 0.2s',
+      fontSize: '0.85rem',
+    
+  },
   disabledUpdateButton: {
     padding: '6px 12px',
     backgroundColor: '#cccccc',
@@ -193,7 +205,7 @@ const getResponsiveStyles = () => {
 };
 
 const Profile = () => {
-  const { user, fetchRecords, records, updateRecord } = useAuthUser();
+  const { user, fetchRecords, records, updateRecord,deleteRecord } = useAuthUser();
   const [statusMap, setStatusMap] = useState({});
   const [responsiveStyles, setResponsiveStyles] = useState(getResponsiveStyles());
 
@@ -229,6 +241,18 @@ const Profile = () => {
     }
   };
 
+const handleDeleteClick = async (id,platformName) => {
+  try {
+    alert("Insode Delete");
+    const newStatus = statusMap[id] || 'Interview Scheduled';
+    await deleteRecord(user.email,id,platformName);
+    await fetchRecords(user.email);
+
+  }
+  catch(error) {
+    return;
+  }
+}
   // Function to format date (remove time part)
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -297,7 +321,7 @@ const Profile = () => {
       <table style={profileStyles.table} className="profile-job-table">
         <thead>
           <tr>
-            {['#', 'Job Name', 'Status', 'Date Applied', 'Company Name', 'Link', 'Platform Name', 'Change Status', 'Update'].map((header, idx) => (
+            {['#', 'Job Name', 'Status', 'Date Applied', 'Company Name', 'Link', 'Platform Name', 'Change Status', 'Update','Delete'].map((header, idx) => (
               <th key={idx} style={profileStyles.tableHeader} className="profile-table-header">
                 {header}
               </th>
@@ -355,7 +379,18 @@ const Profile = () => {
                   >
                     Update
                   </button>
+                 
                 </td>
+                <td>
+                <button 
+                    style={false ? profileStyles.disabledUpdateButton : profileStyles.deleteButton}
+                    className="profile-update-button"
+                    onClick={() => handleDeleteClick(record.jobListingId, record.platformName)}
+                   
+                  >
+                    Delete
+                  </button>
+                  </td>
               </tr>
             ))
           ) : (
