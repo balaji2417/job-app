@@ -164,7 +164,7 @@ app.post("/api/updateRecord", async (req, res) => {
             where: { userId_jobListingId: { userId: email, jobListingId: id } },
             data: { status: value }
         });
-        if (value === 'Rejected' || value === 'Accepted') { // Assuming 'Selected' should be 'Accepted'
+        if (value === 'Rejected' || value === 'Selected') { 
             const incrementField = value === 'Rejected' ? { rejections: { increment: 1 } } : { interviews: { increment: 1 } };
             await prisma.performanceMetrics.update({
                 where: { userId_platformName: { userId: email, platformName: platformName } },
