@@ -150,7 +150,8 @@ app.post('/api/login', async (req, res) => {
 
         if (user && user.password === password) {
             const token = generateToken(user);
-            res.cookie('token', token, { httpOnly: true, secure: true, maxAge: 3600000 }); // 1 hour expiry
+            res.cookie('token', token, { httpOnly: true, secure: true, maxAge: 3600000, sameSite: 'None', domain: 'https://job-portal-peach-zeta.vercel.app' }); // If on different subdomains
+
             return res.status(200).json({ message: "Login successful", user });
         } else {
             return res.status(401).json({ message: "Invalid email or password" });
