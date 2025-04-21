@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: 'https://job-app-rynm.onrender.com', // React app's URL
+    origin: 'https://job-portal-peach-zeta.vercel.app', // React app's URL
     methods: ['POST', 'GET'],
     credentials: true,  // Allow cookies to be sent with the request
 }));
