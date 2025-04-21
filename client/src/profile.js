@@ -278,10 +278,9 @@ const Profile = () => {
     return counts;
   };
 
-  // Check if controls should be disabled based on status
-  const isDisabled = (recordStatus, recordId) => {
-    const currentStatus = statusMap[recordId] || recordStatus;
-    return currentStatus === 'Selected' || currentStatus === 'Rejected';
+  // Check if controls should be disabled based on the existing status in database
+  const isDisabled = (status) => {
+    return status === 'Selected' || status === 'Rejected';
   };
 
   const statusCounts = getStatusCounts();
@@ -336,13 +335,12 @@ const Profile = () => {
                 <td style={profileStyles.tableCell} className="profile-table-cell">{record.platformName}</td>
                 <td style={profileStyles.tableCell} className="profile-table-cell">
                   <select
-                    style={isDisabled(record.status, record.jobListingId) ? profileStyles.disabledSelectInput : profileStyles.selectInput}
+                    style={isDisabled(record.status) ? profileStyles.disabledSelectInput : profileStyles.selectInput}
                     className="profile-status-select"
                     value={statusMap[record.jobListingId] || record.status}
                     onChange={(e) => handleStatusChange(record.jobListingId, e.target.value)}
-                    disabled={isDisabled(record.status, record.jobListingId)}
+                    disabled={isDisabled(record.status)}
                   >
-                    <option value="Applied">Applied</option>
                     <option value="Interview Scheduled">Interview Scheduled</option>
                     <option value="Selected">Selected</option>
                     <option value="Rejected">Rejected</option>
@@ -350,10 +348,10 @@ const Profile = () => {
                 </td>
                 <td style={profileStyles.tableCell} className="profile-table-cell">
                   <button 
-                    style={isDisabled(record.status, record.jobListingId) ? profileStyles.disabledUpdateButton : profileStyles.updateButton}
+                    style={isDisabled(record.status) ? profileStyles.disabledUpdateButton : profileStyles.updateButton}
                     className="profile-update-button"
                     onClick={() => handleUpdateClick(record.jobListingId, record.platformName)}
-                    disabled={isDisabled(record.status, record.jobListingId)}
+                    disabled={isDisabled(record.status)}
                   >
                     Update
                   </button>
