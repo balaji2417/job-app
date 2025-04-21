@@ -60,6 +60,16 @@ const profileStyles = {
     backgroundColor: 'white',
     fontSize: '0.85rem',
   },
+  disabledSelectInput: {
+    width: '100%',
+    padding: '8px 12px',
+    borderRadius: '4px',
+    border: '1px solid #ddd',
+    backgroundColor: '#f5f5f5',
+    fontSize: '0.85rem',
+    cursor: 'not-allowed',
+    color: '#999',
+  },
   updateButton: {
     padding: '6px 12px',
     backgroundColor: '#3498db',
@@ -68,6 +78,15 @@ const profileStyles = {
     borderRadius: '4px',
     cursor: 'pointer',
     transition: 'background-color 0.2s',
+    fontSize: '0.85rem',
+  },
+  disabledUpdateButton: {
+    padding: '6px 12px',
+    backgroundColor: '#cccccc',
+    color: '#999999',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'not-allowed',
     fontSize: '0.85rem',
   },
   updateButtonHover: {
@@ -259,6 +278,12 @@ const Profile = () => {
     return counts;
   };
 
+  // Check if controls should be disabled based on status
+  const isDisabled = (recordStatus, recordId) => {
+    const currentStatus = statusMap[recordId] || recordStatus;
+    return currentStatus === 'Selected' || currentStatus === 'Rejected';
+  };
+
   const statusCounts = getStatusCounts();
 
   return (
@@ -269,7 +294,6 @@ const Profile = () => {
       <p style={profileStyles.subheader} className="profile-subheader">
         Keep an eye on your progress and update your application statuses as you go
       </p>
-      
       
       <table style={profileStyles.table} className="profile-job-table">
         <thead>
@@ -312,10 +336,11 @@ const Profile = () => {
                 <td style={profileStyles.tableCell} className="profile-table-cell">{record.platformName}</td>
                 <td style={profileStyles.tableCell} className="profile-table-cell">
                   <select
-                    style={profileStyles.selectInput}
+                    style={isDisabled(record.status, record.jobListingId) ? profileStyles.disabledSelectInput : profileStyles.selectInput}
                     className="profile-status-select"
                     value={statusMap[record.jobListingId] || record.status}
                     onChange={(e) => handleStatusChange(record.jobListingId, e.target.value)}
+                    disabled={isDisabled(record.status, record.jobListingId)}
                   >
                     <option value="Applied">Applied</option>
                     <option value="Interview Scheduled">Interview Scheduled</option>
@@ -325,9 +350,10 @@ const Profile = () => {
                 </td>
                 <td style={profileStyles.tableCell} className="profile-table-cell">
                   <button 
-                    style={profileStyles.updateButton}
+                    style={isDisabled(record.status, record.jobListingId) ? profileStyles.disabledUpdateButton : profileStyles.updateButton}
                     className="profile-update-button"
                     onClick={() => handleUpdateClick(record.jobListingId, record.platformName)}
+                    disabled={isDisabled(record.status, record.jobListingId)}
                   >
                     Update
                   </button>
