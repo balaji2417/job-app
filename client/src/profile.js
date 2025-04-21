@@ -137,7 +137,6 @@ const profileStyles = {
   }
 };
 
-// Media queries equivalent in inline styles
 const getResponsiveStyles = () => {
   const width = window.innerWidth;
   
@@ -173,14 +172,23 @@ const getResponsiveStyles = () => {
 };
 
 const Profile = () => {
-  const { user, fetchRecords, records, updateRecord } = useAuthUser();
+  const { user, fetchRecords, records, updateRecord,getFinishedJobs,finishedJobs } = useAuthUser();
   const [statusMap, setStatusMap] = useState({});
   const [responsiveStyles, setResponsiveStyles] = useState(getResponsiveStyles());
+  const [localFinishedJobs, setFinishedJobs] = useState(new Set());
+
 
   useEffect(() => {
     if (user && user.email) {
       fetchRecords(user.email);
     }
+    getFinishedJobs();
+   if(finishedJobs != null) {
+    finishedJobs.forEach(id => {
+      setFinishedJobs(prev => new Set(prev).add(id));
+      
+  });
+}
     
     // Handle responsive design
     const handleResize = () => {
@@ -189,7 +197,7 @@ const Profile = () => {
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [user, fetchRecords]);
+  }, [user, fetchRecords,finishedJobs]);
 
   const handleStatusChange = (id, newStatus) => {
     setStatusMap(prev => ({ ...prev, [id]: newStatus }));
@@ -202,6 +210,7 @@ const Profile = () => {
   const handleUpdateClick = async (id, platformName) => {
     try {
       const newStatus = statusMap[id] || 'Interview Scheduled';
+      setFinishedJobs(prev => new Set(prev).add(id));
       await updateRecord(user.email, newStatus, id, platformName);
       await fetchRecords(user.email);  
     } catch (error) {
@@ -257,6 +266,11 @@ const Profile = () => {
     
     return counts;
   };
+
+  const isJobFinished = (jobId) => {
+    
+    return localFinishedJobs.has(jobId);
+};
 
   const statusCounts = getStatusCounts();
 
@@ -327,6 +341,7 @@ const Profile = () => {
                     style={profileStyles.updateButton}
                     className="profile-update-button"
                     onClick={() => handleUpdateClick(record.jobListingId, record.platformName)}
+                    disabled={isJobFinished(record.jobListingId)}
                   >
                     Update
                   </button>

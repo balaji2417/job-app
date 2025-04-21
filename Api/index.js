@@ -346,6 +346,7 @@ app.get('/api/protected', requireAuth, (req, res) => {
 
 
 app.get("/api/myJobIdsByStatus", requireAuth, async (req, res) => {
+  
     try {
       const email = req.user.email;
       const { status } = req.query;
